@@ -13,7 +13,6 @@ def scene_levels(screen):
     # mC ~ mainConfig
     with open("data/config.json", "r") as mC:
         data = json.load(mC)
-        print(data)
         for level in data["levels"]:
             levels.append(level['title'])
 

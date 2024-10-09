@@ -7,7 +7,7 @@ from scenes.settings import scene_settings
 
 pygame.init()
 
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((900, 900), pygame.NOFRAME )
 pygame.display.set_caption("Tower Defense")
 
 def main():
