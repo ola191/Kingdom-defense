@@ -19,12 +19,18 @@ def quit_game():
 
 def scene_main_menu(screen):
     running = True
-    while running:
-        screen.fill((0, 0, 0))
 
-        start_button = ui_button(screen, "Start Game", (0, 0), (300, 50))
-        settings_button = ui_button(screen, "Settings", (0, 0), (300, 50))
-        quit_button = ui_button(screen, "Close Game", (0, 0), (300, 50))
+    width, height = screen.get_size()
+
+    background_image = pygame.image.load("images/backgrounds/mainmenu.jpg")
+    background_image = pygame.transform.scale(background_image, (width, height))
+
+    while running:
+        screen.blit(background_image, (0,0))
+
+        start_button = ui_button(screen, "Start Game", (0, 0), (300, 50), None, "button_vertical.png")
+        settings_button = ui_button(screen, "Settings", (0, 0), (300, 50),  None, "button_vertical.png")
+        quit_button = ui_button(screen, "Close Game", (0, 0), (300, 50),  None, "button_vertical.png")
 
         buttons_to_layout = [start_button, settings_button, quit_button]
         spacing = 20

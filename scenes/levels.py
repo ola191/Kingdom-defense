@@ -26,11 +26,11 @@ def scene_levels(screen):
         buttons_to_layout = []
 
         for level in levels:
-            button_rect = ui_button(screen, level, (0, 0), (300, 50))
+            button_rect = ui_button(screen, level, (0, 0), (300, 50),  None, "button_vertical.png")
             levels_buttons.append((button_rect, level))
             buttons_to_layout.append(button_rect)
 
-        back_button = ui_button(screen, "back to main menu", (0, 0), (300, 50))
+        back_button = ui_button(screen, "back to main menu", (0, 0), (300, 50),  None, "button_vertical.png")
 
         buttons_to_layout.append(back_button)
 

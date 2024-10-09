@@ -9,7 +9,7 @@ def scene_settings(screen):
     while running:
         screen.fill((0, 0, 0))
 
-        back_button = ui_button(screen, "back to main menu", (300, 200), (300, 50))
+        back_button = ui_button(screen, "back to main menu", (300, 200), (300, 50),  None, "button_vertical.png")
 
         buttons_to_layout = [back_button]
 
