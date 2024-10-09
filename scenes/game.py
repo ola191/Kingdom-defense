@@ -21,6 +21,15 @@ class SceneGame:
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
+        self.towers = []
+        self.gold = None
+        self.enemies_types = []
+        self.enemies_spawn_timer = None
+        self.enemies_spawn_delay = None
+        self.enemies_speed = None
+
+        self.load_game_settings(self.level_name)
+
     def load_map_data(self, level_name):
         # mC ~ mainConfig
         with open("data/config.json", "r") as mC:
@@ -28,6 +37,22 @@ class SceneGame:
             for level in data["levels"]:
                 if level["title"] == level_name:
                     return level.get("map")
+
+    def load_game_settings(self, level_name):
+        with open("data/config.json", "r") as mC:
+            data = json.load(mC)
+
+            game_settings_data = None
+
+            for level in data["levels"]:
+                if level["title"] == level_name:
+                    game_settings_data = level.get("settings")
+
+        self.gold = game_settings_data["gold"]
+        self.enemies_types = game_settings_data["enemies"]["types"]
+        self.enemies_speed = game_settings_data["enemies"]["speed"]
+        self.enemies_spawn_delay = game_settings_data["enemies"]["spawn_delay"]
+        self.enemies_spawn_timer = game_settings_data["enemies"]["spawn_timer"]
 
     def calculate_start_and_block_unit(self):
         map_width = len(self.map_data[0])
@@ -70,6 +95,8 @@ class SceneGame:
 
 def scene_game(screen, level_name):
     game_scene = SceneGame(screen, level_name)
+
+    # print(', '.join("%s: %s" % item for item in vars(game_scene).items()))
 
     while game_scene.running:
         for event in pygame.event.get():

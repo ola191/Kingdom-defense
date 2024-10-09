@@ -8,6 +8,15 @@
             "title": "village",
             "completed": false,
             "trials": false,
+            "settings" : {
+                "enemies" : {
+                    "types" : ["black"],
+                    "spawn_timer" : 0,
+                    "spawn_delay": 1000,
+                    "speed" : 2
+                },
+                "gold" : 100
+            },
             "map": [
                 [
                     0,
