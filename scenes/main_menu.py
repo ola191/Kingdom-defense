@@ -19,51 +19,69 @@ def quit_game():
     pygame.quit()
     sys.exit()
 
-def scene_main_menu(screen):
-    running = True
+class SceneMainMenu:
+    def __init__(self, screen):
+        self.screen = screen
+        self.width, self.height = self.screen.get_size()
 
-    width, height = screen.get_size()
 
-    background_image = pygame.image.load("images/backgrounds/mainmenu.jpg")
-    background_image = pygame.transform.scale(background_image, (width, height))
+        self.background_image = pygame.image.load("images/backgrounds/mainmenu.jpg")
+        self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))
 
-    with open("data/config.json", "r") as mC:
-        data = json.load(mC)
-        brightness_from_config = data["settings"]["brightness"]
+        with open("data/config.json", "r") as mC:
+            data = json.load(mC)
+            self.brightness_from_config = data["settings"]["brightness"]
 
-    filter = ui_brightness(screen, brightness_from_config)
+        self.filter = ui_brightness(screen, self.brightness_from_config)
 
-    while running:
-        screen.blit(background_image, (0,0))
 
-        start_button = ui_button(screen, "Start Game", (0, 0), (300, 50), None, "button_vertical.png")
-        settings_button = ui_button(screen, "Settings", (0, 0), (300, 50),  None, "button_vertical.png")
-        quit_button = ui_button(screen, "Close Game", (0, 0), (300, 50),  None, "button_vertical.png")
+        self.start_button = ui_button(screen, "Start Game", (0, 0), (300, 50), None, "button_vertical.png")
+        self.settings_button = ui_button(screen, "Settings", (0, 0), (300, 50),  None, "button_vertical.png")
+        self.quit_button = ui_button(screen, "Close Game", (0, 0), (300, 50),  None, "button_vertical.png")
 
-        buttons_to_layout = [start_button, settings_button, quit_button]
-        spacing = 20
-        available_width, available_height = screen.get_size()
-        positions = layout_column(buttons_to_layout, available_width, available_height, spacing)
+        self.buttons_to_layout = [self.start_button, self.settings_button, self.quit_button]
+        self.spacing = 20
+        self.available_width, self.available_height = self.screen.get_size()
+        self.positions = layout_column(self.buttons_to_layout, self.available_width, self.available_height, self.spacing)
 
-        for button, (x,y) in zip(buttons_to_layout, positions):
+    def draw(self):
+        self.screen.blit(self.background_image, (0,0))
+
+        for button, (x,y) in zip(self.buttons_to_layout, self.positions):
             button.draw()
 
-        filter.draw()
+        self.filter.draw()
 
         pygame.display.flip()
 
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.start_button.collidepoint(event.pos):
+                return 'levels'
+            elif self.settings_button.collidepoint(event.pos):
+                return 'settings'
+            elif self.quit_button.collidepoint(event.pos):
+                self.quit_game
+
+    @staticmethod
+    def quit_game():
+        pygame.quit()
+        sys.exit()
+
+def scene_main_menu(screen):
+    main_menu_scene = SceneMainMenu(screen)
+
+    running = True
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button.collidepoint(event.pos):
-                    print("1")
-                    return 'levels'
-                elif settings_button.collidepoint(event.pos):
-                    print("2")
-                    return 'settings'
-                elif quit_button.collidepoint(event.pos):
-                    print("4")
-                    quit_game()
+            else:
+                scene_action = main_menu_scene.handle_event(event)
+                if scene_action:
+                    return scene_action
+
+        main_menu_scene.draw()
+        pygame.display.flip()
 
     pygame.quit()
