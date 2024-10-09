@@ -1,6 +1,6 @@
 import pygame
 
-from ui.button import ui_button
+from ui.components.button import ui_button
 
 def scene_settings(screen):
     running = True

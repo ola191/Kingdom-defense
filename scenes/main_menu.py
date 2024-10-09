@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-from ui.button import ui_button
+from ui.components.button import ui_button
 
 def start_game(screen):
     pass
