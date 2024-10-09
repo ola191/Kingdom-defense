@@ -7,72 +7,76 @@ from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_gre
 from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
 
+class SceneGame:
+    def __init__(self, screen, level_name):
+        self.screen = screen
+        self.level_name = level_name
+        self.running = True
+        self.map_data = self.load_map_data(level_name)
+        self.width, self.height = self.screen.get_size()
 
-def calculate_start_and_block_unit(screen, map_data):
-    width, height = screen.get_size()
-    map_width = len(map_data[0])
-    map_height = len(map_data)
+        with open("data/config.json", "r") as mC:
+            data = json.load(mC)
+            self.brightness_from_config = data["settings"]["brightness"]
 
-    block_unit = min(width / map_width, height / map_height)
+        self.filter = ui_brightness(screen, self.brightness_from_config)
 
-    start_x = (width - (block_unit * map_width)) / 2
-    start_y = (height - (block_unit * map_height)) / 2
+    def load_map_data(self, level_name):
+        # mC ~ mainConfig
+        with open("data/config.json", "r") as mC:
+            data = json.load(mC)
+            for level in data["levels"]:
+                if level["title"] == level_name:
+                    return level.get("map")
 
-    return start_x, start_y, block_unit
+    def calculate_start_and_block_unit(self):
+        map_width = len(self.map_data[0])
+        map_height = len(self.map_data)
 
-def draw_map(screen, map_data):
+        block_unit = min(self.width / map_width, self.height / map_height)
 
-    start_x, start_y, block_unit = calculate_start_and_block_unit(screen, map_data)
+        start_x = (self.width - (block_unit * map_width)) / 2
+        start_y = (self.height - (block_unit * map_height)) / 2
 
-    for row in range(len(map_data)):
-        for col in range(len(map_data[row])):
-            block_type = map_data[row][col]
-            color = ui_color_red
-            if block_type == 0:
-                color = ui_color_grass
-            elif block_type == 1:
-                color = ui_color_sand
-            pygame.draw.rect(screen, color, (start_x + col * block_unit ,start_y + row * block_unit, block_unit, block_unit))
+        return start_x, start_y, block_unit
 
-def load_map_data(level_name):
-    # mC ~ mainConfig
-    with open("data/config.json", "r") as mC:
-        data = json.load(mC)
-        for level in data["levels"]:
-            if level["title"] == level_name:
-                return level.get("map")
+    def draw_map(self):
 
-def scene_game(screen, level_name):
-    running = True
+        start_x, start_y, block_unit = self.calculate_start_and_block_unit()
 
-    map_data = load_map_data(level_name)
+        for row in range(len(self.map_data)):
+            for col in range(len(self.map_data[row])):
+                block_type = self.map_data[row][col]
+                color = ui_color_red
+                if block_type == 0:
+                    color = ui_color_grass
+                elif block_type == 1:
+                    color = ui_color_sand
+                pygame.draw.rect(self.screen, color,
+                                 (start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit))
 
-    with open("data/config.json", "r") as mC:
-        data = json.load(mC)
-        brightness_from_config = data["settings"]["brightness"]
+    def handle_event(self, event):
+        if event.type == pygame.QUIT:
+            self.running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                return 'levels'
 
-    filter = ui_brightness(screen, brightness_from_config)
-
-    while running:
-        screen.fill(ui_color_grass)
-
-        draw_map(screen, map_data)
-
-        # title_button = ui_button(screen, f"{level_name}", (300, 100), (200,50))
-        # back_button = ui_button(screen, "back to main menu", (300, 200), (200, 50))
-
-        filter.draw()
-
+    def draw(self):
+        self.screen.fill(ui_color_grass)
+        self.draw_map()
+        self.filter.draw()
         pygame.display.flip()
 
+def scene_game(screen, level_name):
+    game_scene = SceneGame(screen, level_name)
+
+    while game_scene.running:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            # elif event.type == pygame.MOUSEBUTTONDOWN:
-            #     if back_button.collidepoint(event.pos):
-            #         return 'main_menu'
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    return 'levels'
+            scene_action = game_scene.handle_event(event)
+            if scene_action:
+                return scene_action
+
+        game_scene.draw()
 
     pygame.quit()
