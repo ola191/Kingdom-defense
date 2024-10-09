@@ -5,6 +5,18 @@
       "title" : "village",
       "completed" : false,
       "trials" : false
+    },
+      {
+      "level" : 2,
+      "title" : "town",
+      "completed" : false,
+      "trials" : false
+    },
+      {
+      "level" : 3,
+      "title" : "castle",
+      "completed" : false,
+      "trials" : false
     }
   ]
  }
