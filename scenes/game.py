@@ -22,6 +22,7 @@ class SceneGame:
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
         self.towers = []
+        self.enemies = []
         self.gold = None
         self.enemies_types = []
         self.enemies_spawn_timer = None
@@ -80,6 +81,25 @@ class SceneGame:
                 pygame.draw.rect(self.screen, color,
                                  (start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit))
 
+    def draw_towers(self):
+        for tower in self.towers:
+            pass
+
+    def draw_enemies(self):
+        for enemy in self.enemies:
+            pygame.draw.rect(self.screen, ui_color_black, enemy)
+
+    def spawn_enemy(self):
+        enemy = pygame.Rect(0,0, 50, 50)
+        self.enemies.append(enemy)
+
+    def move_enemies(self):
+        for enemy in self.enemies:
+            enemy.x += self.enemies_speed
+
+    def find_road(self):
+        pass
+
     def handle_event(self, event):
         if event.type == pygame.QUIT:
             self.running = False
@@ -90,8 +110,19 @@ class SceneGame:
     def draw(self):
         self.screen.fill(ui_color_grass)
         self.draw_map()
+        self.draw_towers()
+        self.draw_enemies()
         self.filter.draw()
         pygame.display.flip()
+
+    def update(self):
+        print(self.enemies)
+        self.enemies_spawn_timer += 1
+        if self.enemies_spawn_timer >= self.enemies_spawn_delay:
+            if len(self.enemies) < 10:
+                self.spawn_enemy()
+                self.enemies_spawn_timer = 0
+        self.move_enemies()
 
 def scene_game(screen, level_name):
     game_scene = SceneGame(screen, level_name)
@@ -104,6 +135,7 @@ def scene_game(screen, level_name):
             if scene_action:
                 return scene_action
 
+        game_scene.update()
         game_scene.draw()
 
     pygame.quit()
