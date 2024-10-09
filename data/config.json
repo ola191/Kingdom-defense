@@ -1,0 +1,10 @@
+{
+  "levels" : [
+    {
+      "level" : 1,
+      "title" : "village",
+      "completed" : false,
+      "trials" : false
+    }
+  ]
+ }
