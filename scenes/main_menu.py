@@ -19,7 +19,7 @@ def draw_button(screen, text, position, size, action=None):
     screen.blit(label, (position[0] + (size[0] - label.get_width()) // 2, position[1] + (size[1] - label.get_height()) // 2))
     return button_rect
 
-def main_menu(screen):
+def scene_main_menu(screen):
     running = True
     while running:
         screen.fill((0, 0, 0))
@@ -35,10 +35,13 @@ def main_menu(screen):
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.collidepoint(event.pos):
-                    start_game(screen)
+                    return 'levels'
+                elif settings_button.collidepoint(event.pos):
+                    return 'settings'
                 elif settings_button.collidepoint(event.pos):
                     open_settings(screen)
                 elif quit_button.collidepoint(event.pos):
                     quit_game()
+
 
     pygame.quit()
