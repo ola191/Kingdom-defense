@@ -5,6 +5,8 @@ import sys
 
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, ui_color_grass
 from ui.components.button import ui_button
+from ui.filters.brightness import ui_brightness
+
 
 def calculate_start_and_block_unit(screen, map_data):
     width, height = screen.get_size()
@@ -45,6 +47,11 @@ def scene_game(screen, level_name):
 
     map_data = load_map_data(level_name)
 
+    with open("data/config.json", "r") as mC:
+        data = json.load(mC)
+        brightness_from_config = data["settings"]["brightness"]
+
+    filter = ui_brightness(screen, brightness_from_config)
 
     while running:
         screen.fill(ui_color_grass)
@@ -53,6 +60,8 @@ def scene_game(screen, level_name):
 
         # title_button = ui_button(screen, f"{level_name}", (300, 100), (200,50))
         # back_button = ui_button(screen, "back to main menu", (300, 200), (200, 50))
+
+        filter.draw()
 
         pygame.display.flip()
 

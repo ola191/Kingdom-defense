@@ -37,4 +37,6 @@ class ui_slider:
             self.value = int(((self.handle_rect.centerx - self.rect.left) / self.rect.width) * self.max_value)
 
     def get_value(self):
+        if self.value < 25:
+            return 25
         return self.value

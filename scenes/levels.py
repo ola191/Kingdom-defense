@@ -4,6 +4,7 @@ import pygame
 import sys
 
 from ui.components.button import ui_button
+from ui.filters.brightness import ui_brightness
 from ui.layout.column import layout_column
 
 
@@ -24,6 +25,12 @@ def scene_levels(screen):
 
     background_image = pygame.image.load("images/backgrounds/levels.png")
     background_image = pygame.transform.scale(background_image, (width, height))
+
+    with open("data/config.json", "r") as mC:
+        data = json.load(mC)
+        brightness_from_config = data["settings"]["brightness"]
+
+    filter = ui_brightness(screen, brightness_from_config)
 
     while running:
         screen.blit(background_image, (0,0))
@@ -46,6 +53,8 @@ def scene_levels(screen):
         for button, (x, y) in zip(buttons_to_layout, positions):
             button.position = (x, y)
             button.draw()
+
+        filter.draw()
 
         pygame.display.flip()
 
