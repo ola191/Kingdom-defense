@@ -6,8 +6,14 @@ from ui.layout.column import layout_column
 
 def scene_settings(screen):
     running = True
+
+    width, height = screen.get_size()
+
+    background_image = pygame.image.load("images/backgrounds/library.png")
+    background_image = pygame.transform.scale(background_image, (width, height))
+
     while running:
-        screen.fill((0, 0, 0))
+        screen.blit(background_image, (0,0))
 
         back_button = ui_button(screen, "back to main menu", (300, 200), (300, 50),  None, "button_vertical.png")
 

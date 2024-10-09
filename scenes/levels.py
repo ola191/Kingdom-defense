@@ -20,8 +20,13 @@ def scene_levels(screen):
 
     levels_buttons = []
 
+    width, height = screen.get_size()
+
+    background_image = pygame.image.load("images/backgrounds/levels.png")
+    background_image = pygame.transform.scale(background_image, (width, height))
+
     while running:
-        screen.fill((0, 0, 0))
+        screen.blit(background_image, (0,0))
 
         buttons_to_layout = []
 
