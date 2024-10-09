@@ -1,6 +1,7 @@
 import pygame
 
 from ui.components.button import ui_button
+from ui.components.slider import ui_slider
 from ui.layout.column import layout_column
 
 
@@ -11,6 +12,8 @@ def scene_settings(screen):
 
     background_image = pygame.image.load("images/backgrounds/library.png")
     background_image = pygame.transform.scale(background_image, (width, height))
+
+    slider = ui_slider(screen, (200, 300), (400, 20), min_value=0, max_value=100, initial_value=50)
 
     while running:
         screen.blit(background_image, (0,0))
@@ -27,7 +30,6 @@ def scene_settings(screen):
             button.position = (x, y)
             button.draw()
 
-        pygame.display.flip()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -38,5 +40,12 @@ def scene_settings(screen):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return 'main_menu'
+
+            slider.handle_event(event)
+        slider.draw()
+        brightness = slider.get_value()
+        print(f"brightness: {brightness}%")
+
+        pygame.display.flip()
 
     pygame.quit()
