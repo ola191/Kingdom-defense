@@ -47,7 +47,7 @@ def scene_game(screen, level_name):
 
 
     while running:
-        screen.fill((0, 0, 0))
+        screen.fill(ui_color_grass)
 
         draw_map(screen, map_data)
 
@@ -59,9 +59,9 @@ def scene_game(screen, level_name):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if back_button.collidepoint(event.pos):
-                    return 'main_menu'
+            # elif event.type == pygame.MOUSEBUTTONDOWN:
+            #     if back_button.collidepoint(event.pos):
+            #         return 'main_menu'
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return 'levels'
