@@ -6,11 +6,22 @@ import sys
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, ui_color_grass
 from ui.components.button import ui_button
 
+def calculate_start_and_block_unit(screen, map_data):
+    width, height = screen.get_size()
+    map_width = len(map_data[0])
+    map_height = len(map_data)
+
+    block_unit = min(width / map_width, height / map_height)
+
+    start_x = (width - (block_unit * map_width)) / 2
+    start_y = (height - (block_unit * map_height)) / 2
+
+    return start_x, start_y, block_unit
+
 def draw_map(screen, map_data):
 
-    width, height = screen.get_size()
+    start_x, start_y, block_unit = calculate_start_and_block_unit(screen, map_data)
 
-    block_unit = width / (len(map_data[0]))
     for row in range(len(map_data)):
         for col in range(len(map_data[row])):
             block_type = map_data[row][col]
@@ -19,7 +30,7 @@ def draw_map(screen, map_data):
                 color = ui_color_grass
             elif block_type == 1:
                 color = ui_color_sand
-            pygame.draw.rect(screen, color, (col * block_unit , row * block_unit, block_unit, block_unit))
+            pygame.draw.rect(screen, color, (start_x + col * block_unit ,start_y + row * block_unit, block_unit, block_unit))
 
 def load_map_data(level_name):
     # mC ~ mainConfig
