@@ -6,6 +6,7 @@ import sys
 from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
 from ui.layout.column import layout_column
+from ui.layout.navbar import layout_navbar
 
 
 class SceneLevels:
@@ -29,11 +30,17 @@ class SceneLevels:
             ui_button(self.screen, level, (0,0), (300,50), None, "button_vertical.png") for level in self.levels
         ]
 
-        self.back_button = ui_button(screen, "back to main menu", (0, 0), (300, 50),  None, "button_vertical.png")
+        self.navbar_buttons = []
 
         self.library_button = ui_button(screen, "library", (self.width - 250, 25), (200, 50), None, "button_vertical.png")
+        self.back_button = ui_button(screen, "back", (0, 0), (75, 50),  None, "button_vertical.png")
 
-        self.buttons_to_layout = self.levels_buttons + [self.back_button]
+        self.navbar_buttons[:] = [*self.navbar_buttons, self.library_button, self.back_button]
+
+        self.navbar_positions = layout_navbar(self.navbar_buttons, self.width, self.height, 10, "right", 25, 20)
+
+        # self.buttons_to_layout = self.levels_buttons + [self.back_button]
+        self.buttons_to_layout = self.levels_buttons
         self.spacing = 20
         self.positions = layout_column(self.buttons_to_layout, self.width, self.height, self.spacing)
 
@@ -44,7 +51,9 @@ class SceneLevels:
             button.position = (x, y)
             button.draw()
 
-        self.library_button.draw()
+        for button, (x,y) in zip(self.navbar_buttons, self.navbar_positions):
+            button.position = (x, y)
+            button.draw()
 
         self.filter.draw()
 
