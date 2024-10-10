@@ -20,7 +20,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        pygame.display.set_caption(f"Tower Defence {game_scene.replace('_', ' ')}")
+        pygame.display.set_caption(f"Tower Defence {str(game_scene).replace('_', ' ')}")
 
         if game_scene == "main_menu":
             selected_scene = scene_main_menu(screen)
@@ -38,8 +38,8 @@ def main():
             selected_scene = scene_library(screen)
             if selected_scene:
                 game_scene = selected_scene
-        elif game_scene.startswith("game_"):
-            level_name = game_scene.split("_")[1]
+        elif str(game_scene).startswith("game_"):
+            level_name = str(game_scene).split("_")[1]
             selected_scene = scene_game(screen, level_name)
             if selected_scene:
                 game_scene = selected_scene

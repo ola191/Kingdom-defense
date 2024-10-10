@@ -40,3 +40,6 @@ class ui_slider:
         if self.value < 25:
             return 25
         return self.value
+
+    def get_size(self):
+        return self.rect.size

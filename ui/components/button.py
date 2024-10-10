@@ -11,6 +11,8 @@ class ui_button:
         self.size = size
         self.image = image
         self.brightness = brightness
+        self.selected = False
+        self.action = action
 
     def draw(self):
         font = pygame.font.Font(None, 40)
@@ -27,11 +29,12 @@ class ui_button:
             pygame.draw.rect(self.screen, ui_color_white, button_rect)
         label = font.render(self.text, True, ui_color_black)
         self.screen.blit(label, (self.position[0] + (self.size[0] - label.get_width()) // 2, self.position[1] + (self.size[1] - label.get_height()) // 2))
-        if self.brightness is not 100:
-            self.brightness_filter = pygame.Surface(self.get_size())
-            self.brightness_filter.fill(ui_color_black)
-            self.brightness_filter.set_alpha(255 - int(255 * (self.brightness / 100)))
-            self.screen.blit(self.brightness_filter, self.position)
+
+        self.brightness_filter = pygame.Surface(self.get_size())
+        self.brightness_filter.fill(ui_color_black)
+        self.brightness_filter.set_alpha(255 - int(255 * (self.brightness / 100)))
+        self.screen.blit(self.brightness_filter, self.position)
+
 
     def get_size(self):
         return self.rect.size

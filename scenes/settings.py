@@ -7,6 +7,7 @@ from ui.components.button import ui_button
 from ui.components.slider import ui_slider
 from ui.filters.brightness import ui_brightness
 from ui.layout.column import layout_column
+from ui.navigators.button_navigator import Navigator
 
 
 class SceneSettings:
@@ -23,24 +24,24 @@ class SceneSettings:
             self.brightness_from_config = data["settings"]["brightness"]
 
         self.slider = ui_slider(screen, (750, 450), (400, 20), min_value=0, max_value=100, initial_value=self.brightness_from_config)
-
         self.back_button = ui_button(screen, "back to main menu", (300, 200), (300, 50), None, "button_vertical.png")
 
-        self.buttons_to_layout = [self.back_button]
+        self.elements_to_layout = [self.slider, self.back_button]
+        self.navigator = Navigator(self.elements_to_layout)
+
         self.spacing = 20
         self.available_width, self.available_height = self.screen.get_size()
-        self.positions = layout_column(self.buttons_to_layout, self.available_width, self.available_height, self.spacing)
+        self.positions = layout_column(self.elements_to_layout, self.available_width, self.available_height, self.spacing)
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
     def draw(self):
         self.screen.blit(self.background_image, (0,0))
 
-        for button, (x, y) in zip(self.buttons_to_layout, self.positions):
-            button.position = (x, y)
-            button.draw()
+        for element, (x, y) in zip(self.elements_to_layout, self.positions):
+            element.position = (x, y)
+            element.draw()
 
-        self.slider.draw()
         self.filter.draw()
 
     def handle_events(self, event):
@@ -50,8 +51,9 @@ class SceneSettings:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return 'main_menu'
-
-        self.slider.handle_event(event)
+        scene_action = self.navigator.handle_event(event)
+        if scene_action:
+            return scene_action
 
     def update(self):
         self.brightness_from_slider = self.slider.get_value()
