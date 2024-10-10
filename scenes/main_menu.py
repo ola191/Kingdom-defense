@@ -8,6 +8,7 @@ import sys
 from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
 from ui.layout.column import layout_column
+from ui.navigators.button_navigator import ButtonNavigator
 
 
 def start_game(screen):
@@ -41,12 +42,12 @@ class SceneMainMenu:
         self.selected_button = self.start_button
 
         self.buttons_to_layout = [self.start_button, self.settings_button, self.quit_button]
+        self.button_navigator = ButtonNavigator(self.buttons_to_layout)
 
         self.spacing = 20
         self.available_width, self.available_height = self.screen.get_size()
         self.positions = layout_column(self.buttons_to_layout, self.available_width, self.available_height, self.spacing)
 
-        self.button_navigator = ButtonNavigator(self.buttons_to_layout)
 
         self.mixer = pygame.mixer
         self.mixer.init()
@@ -102,45 +103,10 @@ class SceneMainMenu:
                 elif self.selected_button == self.quit_button:
                     quit_game()
 
-
-
     @staticmethod
     def quit_game():
         pygame.quit()
         sys.exit()
-
-class ButtonNavigator:
-    def __init__(self, buttons):
-        self.buttons = buttons
-        self.current_index = 0
-        self.brightness_delta = 20
-        self.old_index = self.current_index
-
-    def get_current(self):
-        return self.buttons[self.current_index]
-
-    def get_buttons(self):
-        return self.buttons
-
-    def next(self):
-        self.current_index = (self.current_index + 1) % len(self.buttons)
-        self.change_selected_button_brightness()
-
-    def previous(self):
-        self.current_index = (self.current_index - 1) % len(self.buttons)
-        self.change_selected_button_brightness()
-
-    def change_selected_button_brightness(self):
-        button_to_normal = self.buttons[self.old_index]
-        current_brightness = button_to_normal.brightness
-        button_to_normal.change_brightness(current_brightness + self.brightness_delta)
-
-        self.old_index = self.current_index
-
-        button_to_change = self.buttons[self.current_index]
-        current_brightness = button_to_change.brightness
-        button_to_change.change_brightness(current_brightness - self.brightness_delta)
-
 
 def scene_main_menu(screen):
     main_menu_scene = SceneMainMenu(screen)
