@@ -1,6 +1,6 @@
 {
     "settings": {
-        "brightness": 100
+        "brightness": 56
     },
     "levels": [
         {
@@ -8,14 +8,16 @@
             "title": "village",
             "completed": false,
             "trials": false,
-            "settings" : {
-                "enemies" : {
-                    "types" : ["black"],
-                    "spawn_timer" : 0,
+            "settings": {
+                "enemies": {
+                    "types": [
+                        "black"
+                    ],
+                    "spawn_timer": 0,
                     "spawn_delay": 1000,
-                    "speed" : 2
+                    "speed": 2
                 },
-                "gold" : 100
+                "gold": 100
             },
             "map": [
                 [

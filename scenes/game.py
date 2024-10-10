@@ -1,4 +1,5 @@
 import json
+from collections import deque
 
 import pygame
 import sys
@@ -93,12 +94,47 @@ class SceneGame:
         enemy = pygame.Rect(0,0, 50, 50)
         self.enemies.append(enemy)
 
+        path = self.find_path((0,3), (27,9))
+        print(f"path {path}")
+
     def move_enemies(self):
         for enemy in self.enemies:
             enemy.x += self.enemies_speed
 
-    def find_road(self):
-        pass
+    def find_path(self, start, goal):
+        rows, cols = len(self.map_data), len(self.map_data[0])
+
+        if self.map_data[start[0]][start[1]] != 1 or self.map_data[goal[0]][goal[1]] != 1:
+            return None
+
+        visited = set()
+        queue = deque([(start, [start])])
+
+        iteration_limit = rows * cols
+
+        while queue and iteration_limit > 0:
+            (current_x, current_y), path = queue.popleft()
+
+            if (current_x, current_y) == goal:
+                return path
+
+            visited.add((current_x, current_y))
+
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                neighbor = (current_x + dx, current_y + dy)
+
+                if (0 <= neighbor[0] < rows and
+                        0 <= neighbor[1] < cols and
+                        neighbor not in visited and
+                        self.map_data[neighbor[0]][neighbor[1]] == 1):
+                    queue.append((neighbor, path + [neighbor]))
+
+            iteration_limit -= 1  # Zmniejsz licznik iteracji
+
+        print(f"visited {visited}")
+        print(f"queue {queue}")
+
+        return None
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
@@ -116,7 +152,6 @@ class SceneGame:
         pygame.display.flip()
 
     def update(self):
-        print(self.enemies)
         self.enemies_spawn_timer += 1
         if self.enemies_spawn_timer >= self.enemies_spawn_delay:
             if len(self.enemies) < 10:
