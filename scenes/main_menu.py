@@ -1,3 +1,4 @@
+import asyncio
 import json
 from pydoc_data.topics import topics
 
@@ -47,6 +48,11 @@ class SceneMainMenu:
 
         self.button_navigator = ButtonNavigator(self.buttons_to_layout)
 
+        self.mixer = pygame.mixer
+        self.mixer.init()
+
+        self.click_sound = self.mixer.Sound("sounds/button_click.wav")
+
     def draw(self):
         self.screen.blit(self.background_image, (0,0))
 
@@ -67,14 +73,28 @@ class SceneMainMenu:
                 self.quit_game()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
+                self.click_sound.play()
+
                 self.button_navigator.next()
                 self.buttons_to_layout = self.button_navigator.get_buttons()
                 self.selected_button = self.button_navigator.get_current()
             elif event.key == pygame.K_UP:
+                self.click_sound.play()
+
                 self.button_navigator.previous()
                 self.buttons_to_layout = self.button_navigator.get_buttons()
                 self.selected_button = self.button_navigator.get_current()
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_RETURN:
+                self.click_sound.play()
+
+                self.current_brightness = self.selected_button.brightness
+                self.selected_button.change_brightness(self.current_brightness - self.button_navigator.brightness_delta *2)
+
+                self.draw()
+                pygame.display.flip()
+
+                pygame.time.delay(350)
+
                 if self.selected_button == self.start_button:
                     return 'levels'
                 elif self.selected_button == self.settings_button:
