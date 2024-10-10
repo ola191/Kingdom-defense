@@ -61,7 +61,7 @@ class SceneMainMenu:
             elif self.settings_button.collidepoint(event.pos):
                 return 'settings'
             elif self.quit_button.collidepoint(event.pos):
-                self.quit_game
+                self.quit_game()
 
     @staticmethod
     def quit_game():

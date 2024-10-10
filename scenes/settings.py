@@ -15,7 +15,7 @@ class SceneSettings:
         self.width, self.height = screen.get_size()
 
 
-        self.background_image = pygame.image.load("images/backgrounds/library.png")
+        self.background_image = pygame.image.load("images/backgrounds/prison.png")
         self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))
 
         with open("data/config.json", "r") as mC:

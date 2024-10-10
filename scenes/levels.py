@@ -31,6 +31,8 @@ class SceneLevels:
 
         self.back_button = ui_button(screen, "back to main menu", (0, 0), (300, 50),  None, "button_vertical.png")
 
+        self.library_button = ui_button(screen, "library", (self.width - 250, 25), (200, 50), None, "button_vertical.png")
+
         self.buttons_to_layout = self.levels_buttons + [self.back_button]
         self.spacing = 20
         self.positions = layout_column(self.buttons_to_layout, self.width, self.height, self.spacing)
@@ -42,15 +44,22 @@ class SceneLevels:
             button.position = (x, y)
             button.draw()
 
+        self.library_button.draw()
+
         self.filter.draw()
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.back_button.collidepoint(event.pos):
                 return 'main_menu'
+            elif self.library_button.collidepoint(event.pos):
+                return 'library'
             for button, level in zip(self.levels_buttons, self.levels):
                 if button.collidepoint(event.pos):
                     return f'game_{level}'
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                return 'main_menu'
 
 def scene_levels(screen):
     levels_scene = SceneLevels(screen)

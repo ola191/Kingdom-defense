@@ -1,6 +1,7 @@
 import pygame
 
 from scenes.game import scene_game
+from scenes.library import scene_library
 from scenes.main_menu import scene_main_menu
 from scenes.levels import scene_levels
 from scenes.settings import scene_settings
@@ -31,6 +32,10 @@ def main():
                 game_scene = selected_scene
         elif game_scene == "settings":
             selected_scene = scene_settings(screen)
+            if selected_scene:
+                game_scene = selected_scene
+        elif game_scene == "library":
+            selected_scene = scene_library(screen)
             if selected_scene:
                 game_scene = selected_scene
         elif game_scene.startswith("game_"):
