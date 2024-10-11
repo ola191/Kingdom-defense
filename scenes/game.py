@@ -20,9 +20,6 @@ class SceneGame:
 
         self.mapUnit = None
 
-
-
-
         self.screen = screen
         self.level_name = level_name
         self.running = True
