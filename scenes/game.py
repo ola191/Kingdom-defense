@@ -5,7 +5,8 @@ from collections import deque
 import pygame
 import sys
 
-from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, ui_color_grass
+from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, ui_color_grass, \
+    ui_color_tower
 from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
 
@@ -92,7 +93,7 @@ class SceneGame:
                 elif block_type == 1:
                     color = ui_color_sand
                 elif block_type == 2:
-                    color = ui_color_green
+                    color = ui_color_tower
                 elif block_type == 3:
                     color = ui_color_red
                 pygame.draw.rect(self.screen, color,
@@ -250,9 +251,9 @@ class SceneGame:
 
         self.path = self.find_path(self.startCord, self.endCord)
         self.sort_path_by_distance()
-        if self.path is not None:
-            for x, y in self.path:
-                self.map_data[x][y] = 2
+        # if self.path is not None:
+        #     for x, y in self.path:
+        #         self.map_data[x][y] = 2
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
