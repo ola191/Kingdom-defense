@@ -9,6 +9,8 @@ from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_gre
     ui_color_tower
 from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
+from ui.layout.navbar import layout_navbar
+
 
 class SceneGame:
     def __init__(self, screen, level_name):
@@ -32,6 +34,8 @@ class SceneGame:
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
+
+
         self.towers = []
         self.enemies = []
         self.gold = None
@@ -41,6 +45,11 @@ class SceneGame:
         self.enemies_speed = None
 
         self.load_game_settings(self.level_name)
+
+        self.money_button = ui_button(screen, f"{self.gold}", (0, 0), (75, 50),  None, "button_vertical.png", 100)
+        self.navbar_buttons = [self.money_button]
+
+        self.navbar_positions = layout_navbar(self.navbar_buttons, self.width, self.height, 10, "left", 25, 20)
 
     def load_map_data(self, level_name):
         # mC ~ mainConfig
@@ -247,6 +256,14 @@ class SceneGame:
 
         self.path = sorted_path
 
+    def update_gold(self, action):
+        actions = {
+            "tower" : -50,
+        }
+
+        if action in actions:
+            self.gold += actions[action]
+
     def draw_path(self):
 
         self.path = self.find_path(self.startCord, self.endCord)
@@ -264,10 +281,15 @@ class SceneGame:
 
     def draw(self):
         # self.screen.fill(ui_color_grass)
-        self.screen.fill(ui_color_red)
+        self.screen.fill(ui_color_grass)
         self.draw_map()
         self.draw_towers()
         self.draw_enemies()
+
+        for button, (x,y) in zip(self.navbar_buttons, self.navbar_positions):
+            button.position = (x, y)
+            button.draw()
+
         self.filter.draw()
         pygame.display.flip()
 
