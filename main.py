@@ -13,7 +13,7 @@ pygame.display.set_caption("Tower Defense")
 
 def main():
     running = True
-    game_scene = "main_menu"
+    game_scene = "game_village"
     while running:
 
         for event in pygame.event.get():

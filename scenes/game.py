@@ -1,4 +1,5 @@
 import json
+import math
 from collections import deque
 
 import pygame
@@ -117,32 +118,80 @@ class SceneGame:
                     if self.map_data[row][col] == 1:
                         path.append((row, col))
 
-        spacing_to_check = [(0,1), (0, -1), (1, 0), (-1, 0), (-1,-1), (1,1), (1,-1), (-1, 1)]
+        spacing_to_check = [(0,1), (0,-1), (1, 0), (-1, 0), (-1,-1), (1,1), (1,-1), (-1,1)]
 
         edges = []
 
         for x, y in path:
-            is_edge = False
             for direction in spacing_to_check:
                 nr, nc = x + direction[0], y + direction[1]
                 if 0 <= nr < rows and 0 <= nc < cols:
                     if self.map_data[nr][nc] == 0:
-                        self.map_data[x][y] = 3
-                        is_edge = True
-            if is_edge:
-                edges.append((x, y))
+                        edges.append((x, y))
+                        break
 
-        return path, edges
+        for point in edges:
+            if point in path:
+                path.remove(point)
 
-        # return None
+        for x, y in path:
+            gravity_point = (x,y)
+            points_within_distance = self.find_points_within_distance(path, x, y, 8)
+            filtered_points, avg_direction = self.filter_points_by_direction(points_within_distance, gravity_point)
+            print(filtered_points, avg_direction)
+            to_remove = list(set(points_within_distance)&set(filtered_points))
+            for point in to_remove:
+                path.remove(point)
 
+        return path
+
+    def find_points_within_distance(self, path, x, y, max_distance):
+        nearby_points = []
+
+        for pX, pY in path:
+            # distance = math.sqrt((pX - x) ** 2 + (pY - y) ** 2)
+            distance = abs(pX - x) + abs(pY - y)
+
+            if distance <= max_distance:
+                # if pX != x and pY != y:
+                nearby_points.append((pX, pY))
+
+        if (x,y) in nearby_points:
+            nearby_points.remove((x, y))
+
+        return nearby_points
+
+    def calculate_angle(self, p1, p2):
+        dx = p2[0] - p1[0]
+        dy = p2[1] - p1[1]
+        angle = math.degrees(math.atan2(dy, dx))
+        return angle if angle >= 0 else 360 + angle
+
+    def classify_angle(self, angle):
+        directions = [0, 45, 90, 135, 180, 225, 270, 315]
+        closest_direction = min(directions, key=lambda x: abs(x - angle))
+        return closest_direction
+
+    def average_direction(self, angles):
+        x = sum(math.cos(math.radians(angle)) for angle in angles) / len(angles)
+        y = sum(math.sin(math.radians(angle)) for angle in angles) / len(angles)
+        avg_angle = math.degrees(math.atan2(y, x))
+        return avg_angle if avg_angle >= 0 else 360 + avg_angle
+
+    def filter_points_by_direction(self, points, main_point):
+        angles = [self.calculate_angle(main_point, p) for p in points]
+        classified_angles = [self.classify_angle(angle) for angle in angles]
+        avg_angle = self.classify_angle(self.average_direction(classified_angles))
+
+        filtered_points = [p for p, angle in zip(points, classified_angles) if angle == avg_angle]
+
+        return filtered_points, avg_angle
     def draw_path(self):
 
-        path, edges = self.find_path((0, 3), (29, 25))
+        path = self.find_path((0, 3), (29, 25))
         if path is not None:
             for x, y in path:
-                if (x, y) in edges: self.map_data[x][y] = 3
-                else: self.map_data[x][y] = 2
+                self.map_data[x][y] = 2
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
