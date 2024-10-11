@@ -118,6 +118,7 @@ class SceneGame:
 
     def spawn_enemy(self):
         mapUnit = self.mapUnit
+        self.update_gold("add")
 
         x, y = (self.startCord[1]) * mapUnit, self.startCord[0] * mapUnit
         enemy = {
@@ -195,7 +196,6 @@ class SceneGame:
             gravity_point = (x,y)
             points_within_distance = self.find_points_within_distance(path, x, y, 8)
             filtered_points, avg_direction = self.filter_points_by_direction(points_within_distance, gravity_point)
-            print(filtered_points, avg_direction)
             to_remove = list(set(points_within_distance)&set(filtered_points))
             for point in to_remove:
                 path.remove(point)
@@ -257,12 +257,20 @@ class SceneGame:
         self.path = sorted_path
 
     def update_gold(self, action):
+        if self.gold > 999:
+            self.money_button.rect.width = 100
+        else:
+            self.money_button.rect.width = 75
+
         actions = {
+            "add" : 300,
             "tower" : -50,
         }
 
         if action in actions:
             self.gold += actions[action]
+
+        self.money_button.text = f"{self.gold}"
 
     def draw_path(self):
 
@@ -278,6 +286,22 @@ class SceneGame:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return 'levels'
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                mouuse_pos = pygame.mouse.get_pos()
+                self.handle_click(mouuse_pos)
+
+    def handle_click(self, mouse_pos):
+        start_x, start_y, block_unit = self.calculate_start_and_block_unit()
+        for row in range(len(self.map_data)):
+            for col in range(len(self.map_data[row])):
+                if self.map_data[row][col] == 2:
+                    tower_rect = pygame.Rect(start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit)
+                    if tower_rect.collidepoint(mouse_pos):
+                        self.on_tower_click(row, col)
+
+    def on_tower_click(self, row, col):
+        print("tower clicked")
 
     def draw(self):
         # self.screen.fill(ui_color_grass)
