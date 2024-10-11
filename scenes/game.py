@@ -14,6 +14,7 @@ class SceneGame:
         self.level_name = level_name
         self.running = True
         self.map_data = self.load_map_data(level_name)
+        self.draw_path()
         self.width, self.height = self.screen.get_size()
 
         with open("data/config.json", "r") as mC:
@@ -39,6 +40,7 @@ class SceneGame:
             for level in data["levels"]:
                 if level["title"] == level_name:
                     return level.get("map")
+
 
     def load_game_settings(self, level_name):
         with open("data/config.json", "r") as mC:
@@ -79,6 +81,10 @@ class SceneGame:
                     color = ui_color_grass
                 elif block_type == 1:
                     color = ui_color_sand
+                elif block_type == 2:
+                    color = ui_color_green
+                elif block_type == 3:
+                    color = ui_color_red
                 pygame.draw.rect(self.screen, color,
                                  (start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit))
 
@@ -94,47 +100,33 @@ class SceneGame:
         enemy = pygame.Rect(0,0, 50, 50)
         self.enemies.append(enemy)
 
-        path = self.find_path((0,3), (27,9))
-        print(f"path {path}")
-
     def move_enemies(self):
         for enemy in self.enemies:
             enemy.x += self.enemies_speed
 
     def find_path(self, start, goal):
-        rows, cols = len(self.map_data), len(self.map_data[0])
+        rows = len(self.map_data)
+        cols = len(self.map_data[0])
 
-        if self.map_data[start[0]][start[1]] != 1 or self.map_data[goal[0]][goal[1]] != 1:
-            return None
+        path = []
 
-        visited = set()
-        queue = deque([(start, [start])])
+        for row in range(len(self.map_data)):
+            for col in range(len(self.map_data[row])):
+                if row % 2 == 0 and col % 2 == 0:
+                    if self.map_data[row][col] == 1:
+                        path.append((row, col))
 
-        iteration_limit = rows * cols
+        return path
 
-        while queue and iteration_limit > 0:
-            (current_x, current_y), path = queue.popleft()
+        # return None
 
-            if (current_x, current_y) == goal:
-                return path
+    def draw_path(self):
 
-            visited.add((current_x, current_y))
+        path = self.find_path((0, 3), (29, 25))
 
-            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                neighbor = (current_x + dx, current_y + dy)
-
-                if (0 <= neighbor[0] < rows and
-                        0 <= neighbor[1] < cols and
-                        neighbor not in visited and
-                        self.map_data[neighbor[0]][neighbor[1]] == 1):
-                    queue.append((neighbor, path + [neighbor]))
-
-            iteration_limit -= 1  # Zmniejsz licznik iteracji
-
-        print(f"visited {visited}")
-        print(f"queue {queue}")
-
-        return None
+        if path is not None:
+            for x, y in path:
+                self.map_data[x][y] = 2
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
