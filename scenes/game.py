@@ -20,6 +20,9 @@ class SceneGame:
 
         self.mapUnit = None
 
+
+
+
         self.screen = screen
         self.level_name = level_name
         self.running = True
@@ -27,12 +30,15 @@ class SceneGame:
         self.draw_path()
         self.width, self.height = self.screen.get_size()
 
+        self.map_unit = min(self.width / len(self.map_data[0]), self.height / len(self.map_data))
+
         with open("data/config.json", "r") as mC:
             data = json.load(mC)
             self.brightness_from_config = data["settings"]["brightness"]
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
+        self.texture_grass = pygame.transform.scale(pygame.image.load("images/textures/grass.jpg"), (self.map_unit, self.map_unit))
 
         self.circles = []
 
@@ -97,8 +103,11 @@ class SceneGame:
             for col in range(len(self.map_data[row])):
                 block_type = self.map_data[row][col]
                 color = ui_color_red
+
+
                 if block_type == 0:
-                    color = ui_color_grass
+                    self.screen.blit(self.texture_grass, (start_x + col * block_unit, start_y + row * block_unit))
+                    continue
                 elif block_type == 1:
                     color = ui_color_sand
                 elif block_type == 2:
