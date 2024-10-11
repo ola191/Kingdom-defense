@@ -11,6 +11,13 @@ from ui.filters.brightness import ui_brightness
 
 class SceneGame:
     def __init__(self, screen, level_name):
+
+        self.path = None
+        self.startCord = (0,3)
+        self.endCord = (29, 25)
+
+        self.mapUnit = None
+
         self.screen = screen
         self.level_name = level_name
         self.running = True
@@ -74,6 +81,8 @@ class SceneGame:
 
         start_x, start_y, block_unit = self.calculate_start_and_block_unit()
 
+        self.mapUnit = block_unit
+
         for row in range(len(self.map_data)):
             for col in range(len(self.map_data[row])):
                 block_type = self.map_data[row][col]
@@ -95,15 +104,53 @@ class SceneGame:
 
     def draw_enemies(self):
         for enemy in self.enemies:
-            pygame.draw.rect(self.screen, ui_color_black, enemy)
+            pygame.draw.rect(self.screen, ui_color_black, enemy["rect"])
 
     def spawn_enemy(self):
-        enemy = pygame.Rect(0,0, 50, 50)
+        mapUnit = self.mapUnit
+
+        x, y = (self.startCord[1]) * mapUnit, self.startCord[0] * mapUnit
+        enemy = {
+            "rect": pygame.Rect(x, y, mapUnit, mapUnit),
+            "path_index": 0
+        }
         self.enemies.append(enemy)
 
     def move_enemies(self):
+        mapUnit = self.mapUnit
+        enemies_to_remove = []
+
         for enemy in self.enemies:
-            enemy.x += self.enemies_speed
+            current_index = enemy["path_index"]
+
+            if current_index < len(self.path) - 1:
+                next_point = self.path[current_index + 1]
+                enemy_rect = enemy["rect"]
+
+                target_x = next_point[1] * mapUnit
+                target_y = next_point[0] * mapUnit
+
+                dx = target_x - enemy_rect.x
+                dy = target_y - enemy_rect.y
+
+                dist = math.sqrt(dx ** 2 + dy ** 2)
+
+                if dist != 0:
+                    move_x = self.enemies_speed * (dx / dist)
+                    move_y = self.enemies_speed * (dy / dist)
+                else:
+                    move_x, move_y = 0, 0
+
+                enemy_rect.x += move_x
+                enemy_rect.y += move_y
+
+                if abs(enemy_rect.x - target_x) < self.enemies_speed and abs(
+                        enemy_rect.y - target_y) < self.enemies_speed:
+                    enemy["path_index"] += 1
+            else:
+                enemies_to_remove.append(enemy)
+        for enemy in enemies_to_remove:
+            self.enemies.remove(enemy)
 
     def find_path(self, start, goal):
         rows = len(self.map_data)
@@ -186,11 +233,25 @@ class SceneGame:
         filtered_points = [p for p, angle in zip(points, classified_angles) if angle == avg_angle]
 
         return filtered_points, avg_angle
+
+    def sort_path_by_distance(self):
+        sorted_path = [self.path[0]]
+        remaining_points = self.path[1:]
+
+        while remaining_points:
+            last_point = sorted_path[-1]
+            nearest_point = min(remaining_points, key=lambda point: math.dist(last_point, point))
+            sorted_path.append(nearest_point)
+            remaining_points.remove(nearest_point)
+
+        self.path = sorted_path
+
     def draw_path(self):
 
-        path = self.find_path((0, 3), (29, 25))
-        if path is not None:
-            for x, y in path:
+        self.path = self.find_path(self.startCord, self.endCord)
+        self.sort_path_by_distance()
+        if self.path is not None:
+            for x, y in self.path:
                 self.map_data[x][y] = 2
 
     def handle_event(self, event):

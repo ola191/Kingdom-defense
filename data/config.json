@@ -14,8 +14,8 @@
                         "black"
                     ],
                     "spawn_timer": 0,
-                    "spawn_delay": 1000,
-                    "speed": 2
+                    "spawn_delay": 200,
+                    "speed": 4
                 },
                 "gold": 100
             },
