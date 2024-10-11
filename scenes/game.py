@@ -6,7 +6,7 @@ import pygame
 import sys
 
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, ui_color_grass, \
-    ui_color_tower
+    ui_color_tower, ui_color_blue, ui_color_yellow
 from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
 from ui.layout.navbar import layout_navbar
@@ -14,7 +14,6 @@ from ui.layout.navbar import layout_navbar
 
 class SceneGame:
     def __init__(self, screen, level_name):
-
         self.path = None
         self.startCord = (0,3)
         self.endCord = (29, 25)
@@ -35,6 +34,7 @@ class SceneGame:
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
 
+        self.circles = []
 
         self.towers = []
         self.enemies = []
@@ -300,8 +300,50 @@ class SceneGame:
                     if tower_rect.collidepoint(mouse_pos):
                         self.on_tower_click(row, col)
 
+                square_size = block_unit / 3
+                square_positions = [
+                    (start_x + col * block_unit + (block_unit / 2) - (square_size / 2),
+                     start_y + row * block_unit - square_size),
+                    (start_x + col * block_unit + (block_unit / 2) + (square_size / 2),
+                     start_y + row * block_unit - square_size),
+                    (start_x + col * block_unit + (block_unit / 2) - (square_size / 2),
+                     start_y + row * block_unit + (block_unit / 2)),
+                    (start_x + col * block_unit + (block_unit / 2) + (square_size / 2),
+                     start_y + row * block_unit + (block_unit / 2))
+                ]
+
+                for pos in square_positions:
+                    square_rect = pygame.Rect(pos[0], pos[1], square_size, square_size)
+                    if square_rect.collidepoint(mouse_pos):
+                        self.handle_square_click(row, col)
+
+    def handle_square_click(self, row, col):
+        print(f"Square clicked for tower at ({row}, {col})")
+
     def on_tower_click(self, row, col):
-        print("tower clicked")
+        self.circles.append((row,col))
+        # self.draw_circle_and_squares()
+
+    def draw_circle_and_squares(self):
+        for row,col in self.circles:
+            start_x, start_y, block_unit = self.calculate_start_and_block_unit()
+            center_x = start_x + col * block_unit + block_unit / 2
+            center_y = start_y + row * block_unit + block_unit / 2
+    
+            radius = block_unit * 1.5
+            pygame.draw.circle(self.screen, ui_color_black, (int(center_x), int(center_y)), int(radius), 1)
+    
+            colors = [ui_color_red, ui_color_green, ui_color_blue, ui_color_yellow]
+            square_size = block_unit / 3
+            square_positions = [
+                (center_x - square_size, center_y - square_size),  # Top-left
+                (center_x + square_size, center_y - square_size),  # Top-right
+                (center_x - square_size, center_y + square_size),  # Bottom-left
+                (center_x + square_size, center_y + square_size)   # Bottom-right
+            ]
+    
+            for pos, color in zip(square_positions, colors):
+                pygame.draw.rect(self.screen, color, (*pos, square_size, square_size))
 
     def draw(self):
         # self.screen.fill(ui_color_grass)
@@ -309,7 +351,9 @@ class SceneGame:
         self.draw_map()
         self.draw_towers()
         self.draw_enemies()
-
+        
+        self.draw_circle_and_squares()
+        
         for button, (x,y) in zip(self.navbar_buttons, self.navbar_positions):
             button.position = (x, y)
             button.draw()
