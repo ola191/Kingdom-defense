@@ -109,6 +109,7 @@ class SceneGame:
         cols = len(self.map_data[0])
 
         path = []
+        directions = []
 
         for row in range(len(self.map_data)):
             for col in range(len(self.map_data[row])):
@@ -116,17 +117,32 @@ class SceneGame:
                     if self.map_data[row][col] == 1:
                         path.append((row, col))
 
-        return path
+        spacing_to_check = [(0,1), (0, -1), (1, 0), (-1, 0), (-1,-1), (1,1), (1,-1), (-1, 1)]
+
+        edges = []
+
+        for x, y in path:
+            is_edge = False
+            for direction in spacing_to_check:
+                nr, nc = x + direction[0], y + direction[1]
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    if self.map_data[nr][nc] == 0:
+                        self.map_data[x][y] = 3
+                        is_edge = True
+            if is_edge:
+                edges.append((x, y))
+
+        return path, edges
 
         # return None
 
     def draw_path(self):
 
-        path = self.find_path((0, 3), (29, 25))
-
+        path, edges = self.find_path((0, 3), (29, 25))
         if path is not None:
             for x, y in path:
-                self.map_data[x][y] = 2
+                if (x, y) in edges: self.map_data[x][y] = 3
+                else: self.map_data[x][y] = 2
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
@@ -136,7 +152,8 @@ class SceneGame:
                 return 'levels'
 
     def draw(self):
-        self.screen.fill(ui_color_grass)
+        # self.screen.fill(ui_color_grass)
+        self.screen.fill(ui_color_red)
         self.draw_map()
         self.draw_towers()
         self.draw_enemies()
