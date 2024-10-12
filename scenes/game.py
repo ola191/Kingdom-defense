@@ -123,7 +123,7 @@ class SceneGame:
         cols = len(self.map_data[0])
 
         path = [(row, col) for row in range(rows) for col in range(cols) if row % 2 == 0 and col % 2 == 0 and self.map_data[row][col] == 200]
-
+        # path = []
         # for row in range(rows):
         #     for col in range(cols):
         #         if row % 2 == 0 and col % 2 == 0:
@@ -131,7 +131,7 @@ class SceneGame:
         #                 path.append((row, col))
 
         spacing_to_check = [(0,1), (0,-1), (1, 0), (-1, 0), (-1,-1), (1,1), (1,-1), (-1,1)]
-
+        # edges = set()
         edges = {(x,y) for x,y in path if any(0 <= x + dx < rows and 0 <= y + dy < cols and self.map_data[x + dx][y + dy] == 100 for dx, dy in spacing_to_check)}
 
         # for x, y in path:
@@ -142,19 +142,23 @@ class SceneGame:
         #                 edges.add((x, y))
         #                 break
 
-        path = [point for point in path if point not in edges]
+        # path = [point for point in path if point not in edges]
 
-        # for point in edges:
-        #     if point in path:
-        #         path.remove(point)
+        for point in edges:
+            if point in path:
+                path.remove(point)
+
 
         for x, y in path:
             points_within_distance = self.find_points_within_distance(path, x, y, 8)
             filtered_points, _ = self.filter_points_by_direction(points_within_distance, (x,y))
-            path = [point for point in path if point not in filtered_points]
-            # to_remove = list(set(points_within_distance)&set(filtered_points))
-            # for point in to_remove:
-            #     path.remove(point)
+            # path = [point for point in path if point not in filtered_points]
+            to_remove = list(set(points_within_distance)&set(filtered_points))
+            for point in to_remove:
+                path.remove(point)
+
+        print(path)
+
 
         return path
 
@@ -193,6 +197,8 @@ class SceneGame:
         return closest_direction
 
     def average_direction(self, angles):
+        if not angles:
+            return 0
         x = sum(math.cos(math.radians(angle)) for angle in angles) / len(angles)
         y = sum(math.sin(math.radians(angle)) for angle in angles) / len(angles)
         avg_angle = math.degrees(math.atan2(y, x))

@@ -2,7 +2,7 @@ import pygame
 import math
 
 def spawn_enemy(self):
-    mapUnit = self.mapUnit
+    mapUnit = self.block_unit
     self.update_gold("add")
 
     x, y = (self.startCord[1]) * mapUnit, self.startCord[0] * mapUnit
@@ -13,8 +13,9 @@ def spawn_enemy(self):
     self.enemies.append(enemy)
 
 def move_enemies(self):
-    mapUnit = self.mapUnit
+    mapUnit = self.block_unit
     enemies_to_remove = []
+
 
     for enemy in self.enemies:
         current_index = enemy["path_index"]
