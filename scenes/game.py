@@ -14,6 +14,9 @@ from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
 from ui.layout.navbar import layout_navbar
 
+fps = 0
+clock = pygame.time.Clock()
+
 
 class SceneGame:
     def __init__(self, screen, level_name):
@@ -23,6 +26,9 @@ class SceneGame:
 
         self.mapUnit = None
 
+        self.cache = {}
+
+        self.font =  pygame.font.Font(None,30)
 
         self.screen = screen
         self.level_name = level_name
@@ -130,14 +136,14 @@ class SceneGame:
 
         spacing_to_check = [(0,1), (0,-1), (1, 0), (-1, 0), (-1,-1), (1,1), (1,-1), (-1,1)]
 
-        edges = []
+        edges = set()
 
         for x, y in path:
             for direction in spacing_to_check:
                 nr, nc = x + direction[0], y + direction[1]
                 if 0 <= nr < rows and 0 <= nc < cols:
                     if self.map_data[nr][nc] == 100:
-                        edges.append((x, y))
+                        edges.add((x, y))
                         break
 
         for point in edges:
@@ -155,6 +161,11 @@ class SceneGame:
         return path
 
     def find_points_within_distance(self, path, x, y, max_distance):
+        cache_key = (tuple(path), x, y, max_distance)
+
+        if cache_key in self.cache:
+            return self.cache[cache_key]
+
         nearby_points = []
 
         for pX, pY in path:
@@ -167,6 +178,8 @@ class SceneGame:
 
         if (x,y) in nearby_points:
             nearby_points.remove((x, y))
+
+        self.cache[cache_key] = nearby_points
 
         return nearby_points
 
@@ -197,16 +210,12 @@ class SceneGame:
         return filtered_points, avg_angle
 
     def sort_path_by_distance(self):
-        sorted_path = [self.path[0]]
-        remaining_points = self.path[1:]
+        if not self.path:
+            return
 
-        while remaining_points:
-            last_point = sorted_path[-1]
-            nearest_point = min(remaining_points, key=lambda point: math.dist(last_point, point))
-            sorted_path.append(nearest_point)
-            remaining_points.remove(nearest_point)
+        reference_point = self.path[0]
 
-        self.path = sorted_path
+        self.path.sort(key=lambda point: math.dist(reference_point, point))
 
     def update_gold(self, action):
         if self.gold > 999:
@@ -311,6 +320,8 @@ class SceneGame:
             button.draw()
 
         self.filter.draw()
+        text = self.font.render("Score:" + str(fps), 1, (0, 0, 0))
+        self.screen.blit(text, (150, 20))
         pygame.display.flip()
 
     def update(self):
@@ -326,7 +337,11 @@ def scene_game(screen, level_name):
 
     # print(', '.join("%s: %s" % item for item in vars(game_scene).items()))
 
+    global fps
     while game_scene.running:
+        pygame.event.pump()
+        fps = clock.get_fps()
+        clock.tick(60)
         for event in pygame.event.get():
             scene_action = game_scene.handle_event(event)
             if scene_action:
