@@ -2,6 +2,7 @@ import json
 import math
 import time
 from collections import deque
+from functools import wraps, lru_cache
 
 import pygame
 import sys
@@ -18,6 +19,20 @@ from ui.layout.navbar import layout_navbar
 fps = 0
 clock = pygame.time.Clock()
 
+def timing_decorator(func):
+    @wraps(func)
+    def timeit_wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        # {func.__name__}
+        # {args}
+        # {kwargs}
+        print(f'Function Took {total_time:.4f} seconds')
+        return result
+
+    return timeit_wrapper
 
 class SceneGame:
     def __init__(self, screen, level_name):
@@ -165,6 +180,7 @@ class SceneGame:
 
         return path
 
+    @timing_decorator
     def find_points_within_distance(self, path, x, y, max_distance):
         cache_key = (tuple(path), x, y, max_distance)
 
@@ -188,7 +204,9 @@ class SceneGame:
 
         return nearby_points
 
+    @lru_cache(maxsize=None)
     def calculate_angle(self, p1, p2):
+        time_start = time.time()
         key = (p1, p2)
         if key in self.angle_cache:
             return self.angle_cache[key]
@@ -211,6 +229,7 @@ class SceneGame:
         y = sum(math.sin(math.radians(angle)) for angle in angles) / len(angles)
         avg_angle = math.degrees(math.atan2(y, x))
         return avg_angle if avg_angle >= 0 else 360 + avg_angle
+
 
     def filter_points_by_direction(self, points, main_point):
         angles = [self.calculate_angle(main_point, p) for p in points]
