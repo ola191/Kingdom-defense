@@ -8,7 +8,7 @@ textures = {
     "grass_02": lambda size: load_texture("images/textures/grass_2.jpg", size),
     "grass_03": lambda size: load_texture("images/textures/grass_3.jpg", size),
     "path_01": lambda size: load_texture("images/textures/path_1.jpg", size),
-    "tower_01": lambda size: load_texture("images/textures/grass_1.jpg", size),
+    "tower_01": lambda size: load_texture("images/textures/tower_1.jpg", size),
     "tower_02": lambda size: load_texture("images/textures/tower_2.jpg", size),
     "tower_03": lambda size: load_texture("images/textures/tower_3.jpg", size),
     "tower_04": lambda size: load_texture("images/textures/tower_4.jpg", size),

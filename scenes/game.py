@@ -6,6 +6,7 @@ import pygame
 import sys
 
 from Game.assets import get_texture
+from Game.map import calculate_start_and_block_unit, load_map_data
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, \
     ui_color_tower, ui_color_blue, ui_color_yellow, ui_color_grass_100
 from ui.components.button import ui_button
@@ -24,7 +25,7 @@ class SceneGame:
         self.screen = screen
         self.level_name = level_name
         self.running = True
-        self.map_data = self.load_map_data(level_name)
+        self.map_data = load_map_data(self, level_name)
         self.draw_path()
         self.width, self.height = self.screen.get_size()
 
@@ -74,13 +75,7 @@ class SceneGame:
 
         self.navbar_positions = layout_navbar(self.navbar_buttons, self.width, self.height, 10, "left", 25, 20)
 
-    def load_map_data(self, level_name):
-        # mC ~ mainConfig
-        with open("data/config.json", "r") as mC:
-            data = json.load(mC)
-            for level in data["levels"]:
-                if level["title"] == level_name:
-                    return level.get("map")
+
 
 
     def load_game_settings(self, level_name):
@@ -99,20 +94,11 @@ class SceneGame:
         self.enemies_spawn_delay = game_settings_data["enemies"]["spawn_delay"]
         self.enemies_spawn_timer = game_settings_data["enemies"]["spawn_timer"]
 
-    def calculate_start_and_block_unit(self):
-        map_width = len(self.map_data[0])
-        map_height = len(self.map_data)
 
-        block_unit = min(self.width / map_width, self.height / map_height)
-
-        start_x = (self.width - (block_unit * map_width)) / 2
-        start_y = (self.height - (block_unit * map_height)) / 2
-
-        return start_x, start_y, block_unit
 
     def draw_map(self):
 
-        start_x, start_y, block_unit = self.calculate_start_and_block_unit()
+        start_x, start_y, block_unit = calculate_start_and_block_unit(self)
 
         self.mapUnit = block_unit
 
@@ -327,7 +313,7 @@ class SceneGame:
                 self.handle_click(mouuse_pos)
 
     def handle_click(self, mouse_pos):
-        start_x, start_y, block_unit = self.calculate_start_and_block_unit()
+        start_x, start_y, block_unit = calculate_start_and_block_unit(self)
         for row in range(len(self.map_data)):
             for col in range(len(self.map_data[row])):
                 if self.map_data[row][col] == 300:
@@ -361,7 +347,7 @@ class SceneGame:
 
     def draw_circle_and_squares(self):
         for row,col in self.circles:
-            start_x, start_y, block_unit = self.calculate_start_and_block_unit()
+            start_x, start_y, block_unit = calculate_start_and_block_unit(self)
             center_x = start_x + col * block_unit + block_unit / 2
             center_y = start_y + row * block_unit + block_unit / 2
     
