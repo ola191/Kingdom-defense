@@ -1,5 +1,6 @@
 import json
 import math
+import time
 from collections import deque
 
 import pygame
@@ -27,9 +28,11 @@ class SceneGame:
         self.mapUnit = None
 
         self.cache = {}
+        self.angle_cache = {}
 
         self.font =  pygame.font.Font(None,30)
 
+        self.average = [0]
         self.screen = screen
         self.level_name = level_name
         self.running = True
@@ -45,17 +48,18 @@ class SceneGame:
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
+        size = (self.block_unit, self.block_unit)
         self.textures = {
-            100 : get_texture("grass_01", (self.block_unit, self.block_unit)),
-            101 : get_texture("grass_02",  (self.block_unit, self.block_unit)),
-            102 : get_texture("grass_03",  (self.block_unit, self.block_unit)),
-            200 : get_texture("path_01",  (self.block_unit, self.block_unit)),
-            301 : get_texture("tower_01",  (self.block_unit, self.block_unit)),
-            302 : get_texture("tower_02", (self.block_unit, self.block_unit)),
-            303 : get_texture("tower_03", (self.block_unit, self.block_unit)),
-            304 : get_texture("tower_04", (self.block_unit, self.block_unit)),
-            305 : get_texture("tower_05", (self.block_unit, self.block_unit)),
-            306 : get_texture("tower_06", (self.block_unit, self.block_unit)),
+            100 : get_texture("grass_01", size),
+            101 : get_texture("grass_02",  size),
+            102 : get_texture("grass_03",  size),
+            200 : get_texture("path_01",  size),
+            301 : get_texture("tower_01",  size),
+            302 : get_texture("tower_02", size),
+            303 : get_texture("tower_03", size),
+            304 : get_texture("tower_04", size),
+            305 : get_texture("tower_05", size),
+            306 : get_texture("tower_06", size),
         }
 
 
@@ -99,12 +103,14 @@ class SceneGame:
 
         start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
 
+        map_data = self.map_data
+        textures = self.textures
+
         for row in range(rows):
             for col in range(cols):
-                block_type = self.map_data[row][col]
-                color = ui_color_red
+                block_type = map_data[row][col]
 
-                texture = self.textures.get(block_type)
+                texture = textures.get(block_type)
                 if texture: self.screen.blit(texture, (start_x + col * block_unit, start_y + row * block_unit))
 
 
@@ -117,12 +123,13 @@ class SceneGame:
             pygame.draw.rect(self.screen, ui_color_black, enemy["rect"])
 
 
-
     def find_path(self, start, goal):
         rows = len(self.map_data)
         cols = len(self.map_data[0])
 
-        path = [(row, col) for row in range(rows) for col in range(cols) if row % 2 == 0 and col % 2 == 0 and self.map_data[row][col] == 200]
+        map_data = self.map_data
+
+        path = [(row, col) for row in range(rows) for col in range(cols) if row % 2 == 0 and col % 2 == 0 and map_data[row][col] == 200]
         # path = []
         # for row in range(rows):
         #     for col in range(cols):
@@ -132,7 +139,7 @@ class SceneGame:
 
         spacing_to_check = [(0,1), (0,-1), (1, 0), (-1, 0), (-1,-1), (1,1), (1,-1), (-1,1)]
         # edges = set()
-        edges = {(x,y) for x,y in path if any(0 <= x + dx < rows and 0 <= y + dy < cols and self.map_data[x + dx][y + dy] == 100 for dx, dy in spacing_to_check)}
+        edges = {(x,y) for x,y in path if any(0 <= x + dx < rows and 0 <= y + dy < cols and map_data[x + dx][y + dy] == 100 for dx, dy in spacing_to_check)}
 
         # for x, y in path:
         #     for direction in spacing_to_check:
@@ -148,7 +155,6 @@ class SceneGame:
             if point in path:
                 path.remove(point)
 
-
         for x, y in path:
             points_within_distance = self.find_points_within_distance(path, x, y, 8)
             filtered_points, _ = self.filter_points_by_direction(points_within_distance, (x,y))
@@ -156,9 +162,6 @@ class SceneGame:
             to_remove = list(set(points_within_distance)&set(filtered_points))
             for point in to_remove:
                 path.remove(point)
-
-        print(path)
-
 
         return path
 
@@ -186,10 +189,15 @@ class SceneGame:
         return nearby_points
 
     def calculate_angle(self, p1, p2):
+        key = (p1, p2)
+        if key in self.angle_cache:
+            return self.angle_cache[key]
+
         dx = p2[0] - p1[0]
         dy = p2[1] - p1[1]
-        angle = math.degrees(math.atan2(dy, dx))
-        return angle if angle >= 0 else 360 + angle
+        # angle = math.degrees(math.atan2(dy, dx))
+        # return angle if angle >= 0 else 360 + angle
+        return math.degrees(math.atan2(dy, dx)) % 360
 
     def classify_angle(self, angle):
         directions = [0, 45, 90, 135, 180, 225, 270, 315]
@@ -259,9 +267,11 @@ class SceneGame:
 
         start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
 
+        map_data = self.map_data
+
         for row in range(rows):
             for col in range(cols):
-                if self.map_data[row][col] == 300:
+                if map_data[row][col] == 300:
                     tower_rect = pygame.Rect(start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit)
                     if tower_rect.collidepoint(mouse_pos):
                         self.on_tower_click(row, col)
