@@ -38,23 +38,24 @@ class SceneGame:
         self.draw_path()
         self.width, self.height = self.screen.get_size()
 
-        self.map_unit = min(self.width / len(self.map_data[0]), self.height / len(self.map_data))
+        self.start_x, self.start_y, self.block_unit = calculate_start_and_block_unit(self)
+
 
         self.brightness_from_config = self.config_data["settings"]["brightness"]
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
         self.textures = {
-            100 : get_texture("grass_01", (self.map_unit, self.map_unit)),
-            101 : get_texture("grass_02",  (self.map_unit, self.map_unit)),
-            102 : get_texture("grass_03",  (self.map_unit, self.map_unit)),
-            200 : get_texture("path_01",  (self.map_unit, self.map_unit)),
-            301 : get_texture("tower_01",  (self.map_unit, self.map_unit)),
-            302 : get_texture("tower_02", (self.map_unit, self.map_unit)),
-            303 : get_texture("tower_03", (self.map_unit, self.map_unit)),
-            304 : get_texture("tower_04", (self.map_unit, self.map_unit)),
-            305 : get_texture("tower_05", (self.map_unit, self.map_unit)),
-            306 : get_texture("tower_06", (self.map_unit, self.map_unit)),
+            100 : get_texture("grass_01", (self.block_unit, self.block_unit)),
+            101 : get_texture("grass_02",  (self.block_unit, self.block_unit)),
+            102 : get_texture("grass_03",  (self.block_unit, self.block_unit)),
+            200 : get_texture("path_01",  (self.block_unit, self.block_unit)),
+            301 : get_texture("tower_01",  (self.block_unit, self.block_unit)),
+            302 : get_texture("tower_02", (self.block_unit, self.block_unit)),
+            303 : get_texture("tower_03", (self.block_unit, self.block_unit)),
+            304 : get_texture("tower_04", (self.block_unit, self.block_unit)),
+            305 : get_texture("tower_05", (self.block_unit, self.block_unit)),
+            306 : get_texture("tower_06", (self.block_unit, self.block_unit)),
         }
 
 
@@ -94,11 +95,9 @@ class SceneGame:
 
     def draw_map(self):
 
-        start_x, start_y, block_unit = calculate_start_and_block_unit(self)
-
-        self.mapUnit = block_unit
-
         rows, cols = len(self.map_data), len(self.map_data[0])
+
+        start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
 
         for row in range(rows):
             for col in range(cols):
@@ -123,38 +122,39 @@ class SceneGame:
         rows = len(self.map_data)
         cols = len(self.map_data[0])
 
-        path = []
-        directions = []
+        path = [(row, col) for row in range(rows) for col in range(cols) if row % 2 == 0 and col % 2 == 0 and self.map_data[row][col] == 200]
 
-        for row in range(rows):
-            for col in range(cols):
-                if row % 2 == 0 and col % 2 == 0:
-                    if self.map_data[row][col] == 200:
-                        path.append((row, col))
+        # for row in range(rows):
+        #     for col in range(cols):
+        #         if row % 2 == 0 and col % 2 == 0:
+        #             if self.map_data[row][col] == 200:
+        #                 path.append((row, col))
 
         spacing_to_check = [(0,1), (0,-1), (1, 0), (-1, 0), (-1,-1), (1,1), (1,-1), (-1,1)]
 
-        edges = set()
+        edges = {(x,y) for x,y in path if any(0 <= x + dx < rows and 0 <= y + dy < cols and self.map_data[x + dx][y + dy] == 100 for dx, dy in spacing_to_check)}
+
+        # for x, y in path:
+        #     for direction in spacing_to_check:
+        #         nr, nc = x + direction[0], y + direction[1]
+        #         if 0 <= nr < rows and 0 <= nc < cols:
+        #             if self.map_data[nr][nc] == 100:
+        #                 edges.add((x, y))
+        #                 break
+
+        path = [point for point in path if point not in edges]
+
+        # for point in edges:
+        #     if point in path:
+        #         path.remove(point)
 
         for x, y in path:
-            for direction in spacing_to_check:
-                nr, nc = x + direction[0], y + direction[1]
-                if 0 <= nr < rows and 0 <= nc < cols:
-                    if self.map_data[nr][nc] == 100:
-                        edges.add((x, y))
-                        break
-
-        for point in edges:
-            if point in path:
-                path.remove(point)
-
-        for x, y in path:
-            gravity_point = (x,y)
             points_within_distance = self.find_points_within_distance(path, x, y, 8)
-            filtered_points, avg_direction = self.filter_points_by_direction(points_within_distance, gravity_point)
-            to_remove = list(set(points_within_distance)&set(filtered_points))
-            for point in to_remove:
-                path.remove(point)
+            filtered_points, _ = self.filter_points_by_direction(points_within_distance, (x,y))
+            path = [point for point in path if point not in filtered_points]
+            # to_remove = list(set(points_within_distance)&set(filtered_points))
+            # for point in to_remove:
+            #     path.remove(point)
 
         return path
 
@@ -245,15 +245,13 @@ class SceneGame:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return 'levels'
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                mouuse_pos = pygame.mouse.get_pos()
-                self.handle_click(mouuse_pos)
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.handle_click(pygame.mouse.get_pos())
 
     def handle_click(self, mouse_pos):
-        start_x, start_y, block_unit = calculate_start_and_block_unit(self)
-
         rows, cols = len(self.map_data), len(self.map_data[0])
+
+        start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
 
         for row in range(rows):
             for col in range(cols):
@@ -287,8 +285,11 @@ class SceneGame:
         # self.draw_circle_and_squares()
 
     def draw_circle_and_squares(self):
+
+        start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
+
         for row,col in self.circles:
-            start_x, start_y, block_unit = calculate_start_and_block_unit(self)
+
             center_x = start_x + col * block_unit + block_unit / 2
             center_y = start_y + row * block_unit + block_unit / 2
     
@@ -311,7 +312,7 @@ class SceneGame:
         # self.screen.fill(ui_color_grass)
         self.screen.fill(ui_color_grass_100)
         self.draw_map()
-        self.draw_towers()
+        # self.draw_towers()
         self.draw_enemies()
         
         self.draw_circle_and_squares()
