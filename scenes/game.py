@@ -5,8 +5,8 @@ from collections import deque
 import pygame
 import sys
 
-from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, ui_color_grass, \
-    ui_color_tower, ui_color_blue, ui_color_yellow
+from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, \
+    ui_color_tower, ui_color_blue, ui_color_yellow, ui_color_grass_100
 from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
 from ui.layout.navbar import layout_navbar
@@ -35,7 +35,16 @@ class SceneGame:
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
-        self.texture_grass = pygame.transform.scale(pygame.image.load("images/textures/grass.jpg"), (self.map_unit, self.map_unit))
+        #100
+        self.texture_grass01 = pygame.transform.scale(pygame.image.load("images/textures/grass_1.jpg"), (self.map_unit, self.map_unit))
+        #101
+        self.texture_grass02 = pygame.transform.scale(pygame.image.load("images/textures/grass_2.jpg"), (self.map_unit, self.map_unit))
+        #102
+        self.texture_grass03 = pygame.transform.scale(pygame.image.load("images/textures/grass_3.jpg"), (self.map_unit, self.map_unit))
+        #200
+        self.texture_path01 = pygame.transform.scale(pygame.image.load("images/textures/path_1.jpg"), (self.map_unit, self.map_unit))
+        #300
+        self.texture_tower01 = pygame.transform.scale(pygame.image.load("images/textures/tower_1.jpg"), (self.map_unit, self.map_unit))
 
         self.circles = []
 
@@ -101,18 +110,16 @@ class SceneGame:
                 block_type = self.map_data[row][col]
                 color = ui_color_red
 
-
-                if block_type == 0:
-                    self.screen.blit(self.texture_grass, (start_x + col * block_unit, start_y + row * block_unit))
-                    continue
-                elif block_type == 1:
-                    color = ui_color_sand
-                elif block_type == 2:
-                    color = ui_color_tower
-                elif block_type == 3:
-                    color = ui_color_red
-                pygame.draw.rect(self.screen, color,
-                                 (start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit))
+                if block_type == 100:
+                    self.screen.blit(self.texture_grass01, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 101:
+                    self.screen.blit(self.texture_grass02, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 102:
+                    self.screen.blit(self.texture_grass03, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 200:
+                    self.screen.blit(self.texture_path01, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 300:
+                    self.screen.blit(self.texture_tower01, (start_x + col * block_unit, start_y + row * block_unit))
 
     def draw_towers(self):
         for tower in self.towers:
@@ -179,7 +186,7 @@ class SceneGame:
         for row in range(len(self.map_data)):
             for col in range(len(self.map_data[row])):
                 if row % 2 == 0 and col % 2 == 0:
-                    if self.map_data[row][col] == 1:
+                    if self.map_data[row][col] == 200:
                         path.append((row, col))
 
         spacing_to_check = [(0,1), (0,-1), (1, 0), (-1, 0), (-1,-1), (1,1), (1,-1), (-1,1)]
@@ -190,7 +197,7 @@ class SceneGame:
             for direction in spacing_to_check:
                 nr, nc = x + direction[0], y + direction[1]
                 if 0 <= nr < rows and 0 <= nc < cols:
-                    if self.map_data[nr][nc] == 0:
+                    if self.map_data[nr][nc] == 100:
                         edges.append((x, y))
                         break
 
@@ -301,7 +308,7 @@ class SceneGame:
         start_x, start_y, block_unit = self.calculate_start_and_block_unit()
         for row in range(len(self.map_data)):
             for col in range(len(self.map_data[row])):
-                if self.map_data[row][col] == 2:
+                if self.map_data[row][col] == 300:
                     tower_rect = pygame.Rect(start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit)
                     if tower_rect.collidepoint(mouse_pos):
                         self.on_tower_click(row, col)
@@ -353,7 +360,7 @@ class SceneGame:
 
     def draw(self):
         # self.screen.fill(ui_color_grass)
-        self.screen.fill(ui_color_grass)
+        self.screen.fill(ui_color_grass_100)
         self.draw_map()
         self.draw_towers()
         self.draw_enemies()
