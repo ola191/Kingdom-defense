@@ -5,6 +5,7 @@ from collections import deque
 import pygame
 import sys
 
+from Game.assets import get_texture
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, \
     ui_color_tower, ui_color_blue, ui_color_yellow, ui_color_grass_100
 from ui.components.button import ui_button
@@ -36,25 +37,25 @@ class SceneGame:
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
         #100
-        self.texture_grass01 = pygame.transform.scale(pygame.image.load("images/textures/grass_1.jpg"), (self.map_unit, self.map_unit))
+        self.txt_grass_01 = get_texture("grass_01", (self.map_unit, self.map_unit))
         #101
-        self.texture_grass02 = pygame.transform.scale(pygame.image.load("images/textures/grass_2.jpg"), (self.map_unit, self.map_unit))
+        self.txt_grass_02 = get_texture("grass_02",  (self.map_unit, self.map_unit))
         #102
-        self.texture_grass03 = pygame.transform.scale(pygame.image.load("images/textures/grass_3.jpg"), (self.map_unit, self.map_unit))
+        self.txt_grass_03 = get_texture("grass_03",  (self.map_unit, self.map_unit))
         #200
-        self.texture_path01 = pygame.transform.scale(pygame.image.load("images/textures/path_1.jpg"), (self.map_unit, self.map_unit))
+        self.txt_path_01 = get_texture("path_01",  (self.map_unit, self.map_unit))
         #301
-        self.texture_tower01 = pygame.transform.scale(pygame.image.load("images/textures/tower_1.jpg"), (self.map_unit, self.map_unit))
+        self.txt_tower_01 = get_texture("tower_01",  (self.map_unit, self.map_unit))
         # 302
-        self.texture_tower02 = pygame.transform.scale(pygame.image.load("images/textures/tower_2.jpg"),(self.map_unit, self.map_unit))
+        self.txt_tower_02 = get_texture("tower_02", (self.map_unit, self.map_unit))
         # 303
-        self.texture_tower03 = pygame.transform.scale(pygame.image.load("images/textures/tower_3.jpg"),(self.map_unit, self.map_unit))
+        self.txt_tower_03 = get_texture("tower_03", (self.map_unit, self.map_unit))
         # 304
-        self.texture_tower04 = pygame.transform.scale(pygame.image.load("images/textures/tower_4.jpg"),(self.map_unit, self.map_unit))
+        self.txt_tower_04 = get_texture("tower_04", (self.map_unit, self.map_unit))
         # 305
-        self.texture_tower05 = pygame.transform.scale(pygame.image.load("images/textures/tower_5.jpg"),(self.map_unit, self.map_unit))
+        self.txt_tower_05 = get_texture("tower_05", (self.map_unit, self.map_unit))
         # 306
-        self.texture_tower06 = pygame.transform.scale(pygame.image.load("images/textures/tower_6.jpg"),(self.map_unit, self.map_unit))
+        self.txt_tower_06 = get_texture("tower_06", (self.map_unit, self.map_unit))
 
         self.circles = []
 
@@ -121,25 +122,25 @@ class SceneGame:
                 color = ui_color_red
 
                 if block_type == 100:
-                    self.screen.blit(self.texture_grass01, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_grass_01, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 101:
-                    self.screen.blit(self.texture_grass02, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_grass_02, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 102:
-                    self.screen.blit(self.texture_grass03, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_grass_03, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 200:
-                    self.screen.blit(self.texture_path01, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_path_01, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 301:
-                    self.screen.blit(self.texture_tower01, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_tower_01, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 302:
-                    self.screen.blit(self.texture_tower02, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_tower_02, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 303:
-                    self.screen.blit(self.texture_tower03, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_tower_03, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 304:
-                    self.screen.blit(self.texture_tower04, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_tower_04, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 305:
-                    self.screen.blit(self.texture_tower05, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_tower_05, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 306:
-                    self.screen.blit(self.texture_tower06, (start_x + col * block_unit, start_y + row * block_unit))
+                    self.screen.blit(self.txt_tower_06, (start_x + col * block_unit, start_y + row * block_unit))
 
 
     def draw_towers(self):
