@@ -38,26 +38,20 @@ class SceneGame:
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
-        #100
-        self.txt_grass_01 = get_texture("grass_01", (self.map_unit, self.map_unit))
-        #101
-        self.txt_grass_02 = get_texture("grass_02",  (self.map_unit, self.map_unit))
-        #102
-        self.txt_grass_03 = get_texture("grass_03",  (self.map_unit, self.map_unit))
-        #200
-        self.txt_path_01 = get_texture("path_01",  (self.map_unit, self.map_unit))
-        #301
-        self.txt_tower_01 = get_texture("tower_01",  (self.map_unit, self.map_unit))
-        # 302
-        self.txt_tower_02 = get_texture("tower_02", (self.map_unit, self.map_unit))
-        # 303
-        self.txt_tower_03 = get_texture("tower_03", (self.map_unit, self.map_unit))
-        # 304
-        self.txt_tower_04 = get_texture("tower_04", (self.map_unit, self.map_unit))
-        # 305
-        self.txt_tower_05 = get_texture("tower_05", (self.map_unit, self.map_unit))
-        # 306
-        self.txt_tower_06 = get_texture("tower_06", (self.map_unit, self.map_unit))
+        self.textures = {
+            100 : get_texture("grass_01", (self.map_unit, self.map_unit)),
+            101 : get_texture("grass_02",  (self.map_unit, self.map_unit)),
+            102 : get_texture("grass_03",  (self.map_unit, self.map_unit)),
+            200 : get_texture("path_01",  (self.map_unit, self.map_unit)),
+            301 : get_texture("tower_01",  (self.map_unit, self.map_unit)),
+            302 : get_texture("tower_02", (self.map_unit, self.map_unit)),
+            303 : get_texture("tower_03", (self.map_unit, self.map_unit)),
+            304 : get_texture("tower_04", (self.map_unit, self.map_unit)),
+            305 : get_texture("tower_05", (self.map_unit, self.map_unit)),
+            306 : get_texture("tower_06", (self.map_unit, self.map_unit)),
+        }
+
+
 
         self.circles = []
 
@@ -108,26 +102,8 @@ class SceneGame:
                 block_type = self.map_data[row][col]
                 color = ui_color_red
 
-                if block_type == 100:
-                    self.screen.blit(self.txt_grass_01, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 101:
-                    self.screen.blit(self.txt_grass_02, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 102:
-                    self.screen.blit(self.txt_grass_03, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 200:
-                    self.screen.blit(self.txt_path_01, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 301:
-                    self.screen.blit(self.txt_tower_01, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 302:
-                    self.screen.blit(self.txt_tower_02, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 303:
-                    self.screen.blit(self.txt_tower_03, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 304:
-                    self.screen.blit(self.txt_tower_04, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 305:
-                    self.screen.blit(self.txt_tower_05, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 306:
-                    self.screen.blit(self.txt_tower_06, (start_x + col * block_unit, start_y + row * block_unit))
+                texture = self.textures.get(block_type)
+                if texture: self.screen.blit(texture, (start_x + col * block_unit, start_y + row * block_unit))
 
 
     def draw_towers(self):
