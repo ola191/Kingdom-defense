@@ -43,8 +43,18 @@ class SceneGame:
         self.texture_grass03 = pygame.transform.scale(pygame.image.load("images/textures/grass_3.jpg"), (self.map_unit, self.map_unit))
         #200
         self.texture_path01 = pygame.transform.scale(pygame.image.load("images/textures/path_1.jpg"), (self.map_unit, self.map_unit))
-        #300
+        #301
         self.texture_tower01 = pygame.transform.scale(pygame.image.load("images/textures/tower_1.jpg"), (self.map_unit, self.map_unit))
+        # 302
+        self.texture_tower02 = pygame.transform.scale(pygame.image.load("images/textures/tower_2.jpg"),(self.map_unit, self.map_unit))
+        # 303
+        self.texture_tower03 = pygame.transform.scale(pygame.image.load("images/textures/tower_3.jpg"),(self.map_unit, self.map_unit))
+        # 304
+        self.texture_tower04 = pygame.transform.scale(pygame.image.load("images/textures/tower_4.jpg"),(self.map_unit, self.map_unit))
+        # 305
+        self.texture_tower05 = pygame.transform.scale(pygame.image.load("images/textures/tower_5.jpg"),(self.map_unit, self.map_unit))
+        # 306
+        self.texture_tower06 = pygame.transform.scale(pygame.image.load("images/textures/tower_6.jpg"),(self.map_unit, self.map_unit))
 
         self.circles = []
 
@@ -118,8 +128,19 @@ class SceneGame:
                     self.screen.blit(self.texture_grass03, (start_x + col * block_unit, start_y + row * block_unit))
                 elif block_type == 200:
                     self.screen.blit(self.texture_path01, (start_x + col * block_unit, start_y + row * block_unit))
-                elif block_type == 300:
+                elif block_type == 301:
                     self.screen.blit(self.texture_tower01, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 302:
+                    self.screen.blit(self.texture_tower02, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 303:
+                    self.screen.blit(self.texture_tower03, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 304:
+                    self.screen.blit(self.texture_tower04, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 305:
+                    self.screen.blit(self.texture_tower05, (start_x + col * block_unit, start_y + row * block_unit))
+                elif block_type == 306:
+                    self.screen.blit(self.texture_tower06, (start_x + col * block_unit, start_y + row * block_unit))
+
 
     def draw_towers(self):
         for tower in self.towers:
