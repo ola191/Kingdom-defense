@@ -6,6 +6,7 @@ import pygame
 import sys
 
 from Game.assets import get_texture
+from Game.enemy import spawn_enemy, move_enemies
 from Game.map import calculate_start_and_block_unit, load_map_data
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, \
     ui_color_tower, ui_color_blue, ui_color_yellow, ui_color_grass_100
@@ -137,52 +138,7 @@ class SceneGame:
         for enemy in self.enemies:
             pygame.draw.rect(self.screen, ui_color_black, enemy["rect"])
 
-    def spawn_enemy(self):
-        mapUnit = self.mapUnit
-        self.update_gold("add")
 
-        x, y = (self.startCord[1]) * mapUnit, self.startCord[0] * mapUnit
-        enemy = {
-            "rect": pygame.Rect(x, y, mapUnit, mapUnit),
-            "path_index": 0
-        }
-        self.enemies.append(enemy)
-
-    def move_enemies(self):
-        mapUnit = self.mapUnit
-        enemies_to_remove = []
-
-        for enemy in self.enemies:
-            current_index = enemy["path_index"]
-
-            if current_index < len(self.path) - 1:
-                next_point = self.path[current_index + 1]
-                enemy_rect = enemy["rect"]
-
-                target_x = next_point[1] * mapUnit
-                target_y = next_point[0] * mapUnit
-
-                dx = target_x - enemy_rect.x
-                dy = target_y - enemy_rect.y
-
-                dist = math.sqrt(dx ** 2 + dy ** 2)
-
-                if dist != 0:
-                    move_x = self.enemies_speed * (dx / dist)
-                    move_y = self.enemies_speed * (dy / dist)
-                else:
-                    move_x, move_y = 0, 0
-
-                enemy_rect.x += move_x
-                enemy_rect.y += move_y
-
-                if abs(enemy_rect.x - target_x) < self.enemies_speed and abs(
-                        enemy_rect.y - target_y) < self.enemies_speed:
-                    enemy["path_index"] += 1
-            else:
-                enemies_to_remove.append(enemy)
-        for enemy in enemies_to_remove:
-            self.enemies.remove(enemy)
 
     def find_path(self, start, goal):
         rows = len(self.map_data)
@@ -386,9 +342,9 @@ class SceneGame:
         self.enemies_spawn_timer += 1
         if self.enemies_spawn_timer >= self.enemies_spawn_delay:
             if len(self.enemies) < 10:
-                self.spawn_enemy()
+                spawn_enemy(self)
                 self.enemies_spawn_timer = 0
-        self.move_enemies()
+        move_enemies(self)
 
 def scene_game(screen, level_name):
     game_scene = SceneGame(screen, level_name)
