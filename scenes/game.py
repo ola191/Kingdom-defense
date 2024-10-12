@@ -82,17 +82,13 @@ class SceneGame:
             return json.load(jsonFile)
 
     def load_game_settings(self, level_name, config_data):
-        game_settings_data = None
-
-        for level in config_data["levels"]:
-            if level["title"] == level_name:
-                game_settings_data = level.get("settings")
-
-        self.gold = game_settings_data["gold"]
-        self.enemies_types = game_settings_data["enemies"]["types"]
-        self.enemies_speed = game_settings_data["enemies"]["speed"]
-        self.enemies_spawn_delay = game_settings_data["enemies"]["spawn_delay"]
-        self.enemies_spawn_timer = game_settings_data["enemies"]["spawn_timer"]
+        level_settings = next((level.get("settings") for level in config_data["levels"] if level["title"] == level_name), None)
+        if level_settings:
+            self.gold = level_settings["gold"]
+            self.enemies_types = level_settings["enemies"]["types"]
+            self.enemies_speed = level_settings["enemies"]["speed"]
+            self.enemies_spawn_delay = level_settings["enemies"]["spawn_delay"]
+            self.enemies_spawn_timer = level_settings["enemies"]["spawn_timer"]
 
 
 
@@ -102,8 +98,10 @@ class SceneGame:
 
         self.mapUnit = block_unit
 
-        for row in range(len(self.map_data)):
-            for col in range(len(self.map_data[row])):
+        rows, cols = len(self.map_data), len(self.map_data[0])
+
+        for row in range(rows):
+            for col in range(cols):
                 block_type = self.map_data[row][col]
                 color = ui_color_red
 
@@ -128,8 +126,8 @@ class SceneGame:
         path = []
         directions = []
 
-        for row in range(len(self.map_data)):
-            for col in range(len(self.map_data[row])):
+        for row in range(rows):
+            for col in range(cols):
                 if row % 2 == 0 and col % 2 == 0:
                     if self.map_data[row][col] == 200:
                         path.append((row, col))
@@ -254,8 +252,11 @@ class SceneGame:
 
     def handle_click(self, mouse_pos):
         start_x, start_y, block_unit = calculate_start_and_block_unit(self)
-        for row in range(len(self.map_data)):
-            for col in range(len(self.map_data[row])):
+
+        rows, cols = len(self.map_data), len(self.map_data[0])
+
+        for row in range(rows):
+            for col in range(cols):
                 if self.map_data[row][col] == 300:
                     tower_rect = pygame.Rect(start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit)
                     if tower_rect.collidepoint(mouse_pos):
