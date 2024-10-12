@@ -23,18 +23,18 @@ class SceneGame:
 
         self.mapUnit = None
 
+
         self.screen = screen
         self.level_name = level_name
         self.running = True
         self.map_data = load_map_data(self, level_name)
+        self.config_data = self.load_json_data("data/config.json")
         self.draw_path()
         self.width, self.height = self.screen.get_size()
 
         self.map_unit = min(self.width / len(self.map_data[0]), self.height / len(self.map_data))
 
-        with open("data/config.json", "r") as mC:
-            data = json.load(mC)
-            self.brightness_from_config = data["settings"]["brightness"]
+        self.brightness_from_config = self.config_data["settings"]["brightness"]
 
         self.filter = ui_brightness(screen, self.brightness_from_config)
 
@@ -63,7 +63,7 @@ class SceneGame:
         self.enemies_spawn_delay = None
         self.enemies_speed = None
 
-        self.load_game_settings(self.level_name)
+        self.load_game_settings(self.level_name, self.config_data)
 
         self.money_button = ui_button(screen, f"{self.gold}", (0, 0), (75, 50),  None, "button_vertical.png", 100)
         self.navbar_buttons = [self.money_button]
@@ -71,17 +71,16 @@ class SceneGame:
         self.navbar_positions = layout_navbar(self.navbar_buttons, self.width, self.height, 10, "left", 25, 20)
 
 
+    def load_json_data(self, filename):
+        with open(filename, "r") as jsonFile:
+            return json.load(jsonFile)
 
+    def load_game_settings(self, level_name, config_data):
+        game_settings_data = None
 
-    def load_game_settings(self, level_name):
-        with open("data/config.json", "r") as mC:
-            data = json.load(mC)
-
-            game_settings_data = None
-
-            for level in data["levels"]:
-                if level["title"] == level_name:
-                    game_settings_data = level.get("settings")
+        for level in config_data["levels"]:
+            if level["title"] == level_name:
+                game_settings_data = level.get("settings")
 
         self.gold = game_settings_data["gold"]
         self.enemies_types = game_settings_data["enemies"]["types"]
