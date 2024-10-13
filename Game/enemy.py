@@ -6,7 +6,6 @@ from Game.Spirits.Enemy import Enemy
 
 def spawn_enemy(self, animation_frames):
     mapUnit = self.block_unit
-    self.update_gold("add")
 
     x, y = (self.startCord[1]) * mapUnit, self.startCord[0] * mapUnit
     # enemy = {

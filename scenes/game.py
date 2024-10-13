@@ -219,34 +219,25 @@ class SceneGame:
         if cache_key in self.cache:
             return self.cache[cache_key]
 
-        nearby_points = []
+        nearby_points = [
+            (pX, pY) for pX, pY in path
+            if abs(pX - x) + abs(pY - y) <= max_distance
+        ]
 
-        for pX, pY in path:
-            # distance = math.sqrt((pX - x) ** 2 + (pY - y) ** 2)
-            distance = abs(pX - x) + abs(pY - y)
-
-            if distance <= max_distance:
-                # if pX != x and pY != y:
-                nearby_points.append((pX, pY))
-
-        if (x,y) in nearby_points:
-            nearby_points.remove((x, y))
-
+        nearby_points = [point for point in nearby_points if point != (x, y)]
         self.cache[cache_key] = nearby_points
-
         return nearby_points
 
     def calculate_angle(self, p1, p2):
-        time_start = time.time()
         key = (p1, p2)
         if key in self.angle_cache:
             return self.angle_cache[key]
 
         dx = p2[0] - p1[0]
         dy = p2[1] - p1[1]
-        # angle = math.degrees(math.atan2(dy, dx))
-        # return angle if angle >= 0 else 360 + angle
-        return math.degrees(math.atan2(dy, dx)) % 360
+        angle = math.degrees(math.atan2(dy, dx)) % 360
+        self.angle_cache[key] = angle
+        return angle
 
     def classify_angle(self, angle):
         directions = [0, 45, 90, 135, 180, 225, 270, 315]
