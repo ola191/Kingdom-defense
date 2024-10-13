@@ -45,6 +45,8 @@ class SceneGame:
 
         self.mapUnit = None
 
+        self.hearts = 5
+
         self.cache = {}
         self.angle_cache = {}
 
@@ -112,7 +114,9 @@ class SceneGame:
         self.load_game_settings(self.level_name, self.config_data)
 
         self.money_button = ui_button(screen, f"{self.gold}", (0, 0), (75, 50),  None, "button_vertical.png", 100)
-        self.navbar_buttons = [self.money_button]
+        self.hearts_button = ui_button(screen, f"{self.hearts}", (0,0), (75, 50), None, "button_vertical.png", 100)
+
+        self.navbar_buttons = [self.money_button, self.hearts_button]
 
         self.navbar_positions = layout_navbar(self.navbar_buttons, self.width, self.height, 10, "left", 25, 20)
 
@@ -288,6 +292,11 @@ class SceneGame:
 
         self.money_button.text = f"{self.gold}"
 
+    def update_hearts(self, hearts):
+        self.hearts += hearts
+
+        self.hearts_button.text = f"{self.hearts} ❤️"
+
     def draw_path(self):
 
         self.path = self.find_path(self.startCord, self.endCord)
@@ -328,7 +337,9 @@ class SceneGame:
     def update_enemies(self):
         for enemy in self.enemies:
             if enemy.alive:
-                enemy.move_enemy(self)
+                passed = enemy.move_enemy(self)
+                if passed:
+                    self.update_hearts(passed)
 
     def update_towers(self):
         for tower in self.towers:
@@ -401,7 +412,7 @@ class SceneGame:
             enemies_to_remove, reward = tower.attack(self.enemies)
             for enemy in enemies_to_remove:
                 self.enemies.remove(enemy)
-                self.update_gold(reward)
+                # self.update_gold(reward)
 
     def draw(self):
         # self.screen.fill(ui_color_grass)

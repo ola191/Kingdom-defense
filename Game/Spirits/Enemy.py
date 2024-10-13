@@ -124,3 +124,4 @@ class Enemy:
             # #     self.speed += 1
         else:
             mSelf.enemies.remove(self)
+            return -1
