@@ -4,7 +4,7 @@ import math
 from Game.Spirits.Enemy import Enemy
 
 
-def spawn_enemy(self):
+def spawn_enemy(self, animation_frames):
     mapUnit = self.block_unit
     self.update_gold("add")
 
@@ -13,5 +13,5 @@ def spawn_enemy(self):
         # "rect": pygame.Rect(x, y, mapUnit, mapUnit),
         # "path_index": 0
     # }
-    return Enemy((x, y), "goblin", mapUnit)
+    return Enemy((x, y), "goblin", mapUnit, animation_frames)
 

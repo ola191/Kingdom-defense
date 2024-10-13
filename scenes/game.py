@@ -7,6 +7,7 @@ from functools import wraps, lru_cache
 import pygame
 import sys
 
+from Game.animations import load_animation
 from Game.assets import get_texture
 from Game.enemy import spawn_enemy
 from Game.map import calculate_start_and_block_unit, load_map_data
@@ -95,7 +96,7 @@ class SceneGame:
             326: get_texture("tower_archer_06", size),
         }
 
-
+        self.animation_frames = load_animation("goblin", self.block_unit)
 
         self.circles = []
 
@@ -155,12 +156,13 @@ class SceneGame:
                 self.screen.blit(texture, (x, y))
 
     def draw_enemies(self):
-        goblin_image = pygame.image.load("images/monsters/goblin.jpg")
-        goblin_image = pygame.transform.scale(goblin_image, (self.block_unit, self.block_unit))
+        # goblin_image = pygame.image.load("images/monsters/goblin.jpg")
+        # goblin_image = pygame.transform.scale(goblin_image, (self.block_unit, self.block_unit))
         for enemy in self.enemies:
-            if enemy.alive:
-                x,y = enemy.position
-                self.screen.blit(goblin_image, (x, y))
+            # if enemy.alive:
+            #     x,y = enemy.position
+            #     self.screen.blit(goblin_image, (x, y))
+            enemy.draw(self.screen)
 
     def find_path(self, start, goal):
         rows = len(self.map_data)
@@ -419,10 +421,10 @@ class SceneGame:
         pygame.display.flip()
 
     def update(self):
-        self.enemies_spawn_timer += 20
+        self.enemies_spawn_timer += 1
         if self.enemies_spawn_timer >= self.enemies_spawn_delay:
-            if len(self.enemies) < 100:
-                enemy = spawn_enemy(self)
+            if len(self.enemies) < 10:
+                enemy = spawn_enemy(self, self.animation_frames)
                 self.enemies.append(enemy)
                 self.enemies_spawn_timer = 0
         self.update_enemies()
