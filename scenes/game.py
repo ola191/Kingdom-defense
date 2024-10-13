@@ -8,7 +8,7 @@ import pygame
 import sys
 
 from Game.assets import get_texture
-from Game.enemy import spawn_enemy, move_enemy
+from Game.enemy import spawn_enemy
 from Game.map import calculate_start_and_block_unit, load_map_data
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, \
     ui_color_tower, ui_color_blue, ui_color_yellow, ui_color_grass_100
@@ -155,16 +155,10 @@ class SceneGame:
                 self.screen.blit(texture, (x, y))
 
     def draw_enemies(self):
-        print(self.enemies)
+        goblin_image = pygame.image.load("images/monsters/goblin.jpg")
+        goblin_image = pygame.transform.scale(goblin_image, (self.block_unit, self.block_unit))
         for enemy in self.enemies:
-            if self.help_counter == 100:
-                print(enemy)
-            else:
-                print(self.help_counter)
-                self.help_counter += 0.1
             if enemy.alive:
-                goblin_image = pygame.image.load("images/monsters/goblin.jpg")
-                goblin_image = pygame.transform.scale(goblin_image, (self.block_unit, self.block_unit))
                 x,y = enemy.position
                 self.screen.blit(goblin_image, (x, y))
 
@@ -210,8 +204,8 @@ class SceneGame:
 
         hardPath = [(0, 2), (3, 3), (6, 4), (9, 6), (10, 9), (11, 13), (12, 17), (11, 20), (10, 22), (9, 24), (8, 27), (8, 32), (9, 34), (12, 36), (15, 37), (18, 37), (20, 36), (22, 34), (24, 31), (25, 28), (27, 26), (29, 24)]
 
-        # for x, y in hardPath:
-        #     self.map_data[x][y] = 321
+        for x, y in hardPath:
+            self.map_data[x][y] = 321
 
 
         return hardPath
@@ -338,11 +332,12 @@ class SceneGame:
     def update_enemies(self):
         for enemy in self.enemies:
             if enemy.alive:
-                move_enemy(self, enemy)
+                enemy.move_enemy(self)
 
     def update_towers(self):
         for tower in self.towers:
-            tower.attack(self.enemies)
+            pass
+            # tower.attack(self.enemies)
 
     def handle_click(self, mouse_pos):
         rows, cols = len(self.map_data), len(self.map_data[0])
@@ -424,15 +419,17 @@ class SceneGame:
         pygame.display.flip()
 
     def update(self):
-        self.enemies_spawn_timer += 1
+        self.enemies_spawn_timer += 20
         if self.enemies_spawn_timer >= self.enemies_spawn_delay:
-            if len(self.enemies) < 10:
-                self.enemies.append(spawn_enemy(self))
+            if len(self.enemies) < 100:
+                enemy = spawn_enemy(self)
+                self.enemies.append(enemy)
                 self.enemies_spawn_timer = 0
         self.update_enemies()
         self.update_towers()
         self.draw_enemies()
         self.draw_towers()
+
         # self.destroy_enemies_in_range()
 
 def scene_game(screen, level_name):
