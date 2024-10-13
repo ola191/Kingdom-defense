@@ -120,7 +120,6 @@ class SceneGame:
 
         self.navbar_positions = layout_navbar(self.navbar_buttons, self.width, self.height, 10, "left", 25, 20)
 
-
     def load_json_data(self, filename):
         with open(filename, "r") as jsonFile:
             return json.load(jsonFile)
@@ -422,7 +421,7 @@ class SceneGame:
         self.destroy_enemies_in_range()
 
         self.draw_enemies()
-        
+
 
         for button, (x,y) in zip(self.navbar_buttons, self.navbar_positions):
             button.position = (x, y)

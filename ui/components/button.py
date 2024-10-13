@@ -14,17 +14,15 @@ class ui_button:
         self.selected = False
         self.action = action
 
+        self.images = {
+            "button_vertical.png" : pygame.transform.scale((pygame.image.load("images/ui/button_vertical.png").convert_alpha()), self.size)
+        }
+
     def draw(self):
         font = pygame.font.Font(None, 40)
         button_rect = pygame.Rect(self.position, self.size)
         if self.image is not None:
-            if self.image == "button_vertical.png":
-                background_image = pygame.image.load("images/ui/button_vertical.png")
-                background_image = pygame.transform.scale(background_image, self.size)
-
-                self.screen.blit(background_image, self.position)
-            else:
-                pygame.draw.rect(self.screen, ui_color_red, button_rect)
+            self.screen.blit(self.images[self.image], self.position)
         else:
             pygame.draw.rect(self.screen, ui_color_white, button_rect)
         label = font.render(self.text, True, ui_color_black)
