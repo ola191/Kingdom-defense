@@ -10,7 +10,9 @@
       "trials" : false,
       "settings" : {
         "enemies" : {
-          "types" : ["black"],
+          "types&info" : {
+            "goblin" : 5
+          },
           "spawn_timer" : 0,
           "spawn_delay" : 200,
           "speed" : 4

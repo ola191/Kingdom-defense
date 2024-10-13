@@ -109,7 +109,8 @@ class SceneGame:
         self.towers = []
         self.enemies = []
         self.gold = None
-        self.enemies_types = []
+        self.enemies_number = None
+        self.enemies_count = 0
         self.enemies_spawn_timer = None
         self.enemies_spawn_delay = None
         self.enemies_speed = None
@@ -131,7 +132,7 @@ class SceneGame:
         level_settings = next((level.get("settings") for level in config_data["levels"] if level["title"] == level_name), None)
         if level_settings:
             self.gold = level_settings["gold"]
-            self.enemies_types = level_settings["enemies"]["types"]
+            self.enemies_number = level_settings["enemies"]["types&info"]["goblin"]
             self.enemies_speed = level_settings["enemies"]["speed"]
             self.enemies_spawn_delay = level_settings["enemies"]["spawn_delay"]
             self.enemies_spawn_timer = level_settings["enemies"]["spawn_timer"]
@@ -337,11 +338,15 @@ class SceneGame:
     #             self.enemies.remove(enemy)
 
     def update_enemies(self):
-        for enemy in self.enemies:
-            if enemy.alive:
-                passed = enemy.move_enemy(self)
-                if passed:
-                    self.update_hearts(passed)
+        if len(self.enemies) != 0:
+            for enemy in self.enemies:
+                if enemy.alive:
+                    passed = enemy.move_enemy(self)
+                    if passed:
+                        self.update_hearts(passed)
+        else:
+            if self.enemies_count == self.enemies_number:
+                pygame.quit()
 
     def update_towers(self):
         for tower in self.towers:
@@ -413,7 +418,7 @@ class SceneGame:
             enemies_to_remove, reward = tower.attack(self.enemies)
             for enemy in enemies_to_remove:
                 self.enemies.remove(enemy)
-                # self.update_gold(reward)
+                self.update_gold(reward)
 
     def draw(self):
         # self.screen.fill(ui_color_grass)
@@ -440,7 +445,8 @@ class SceneGame:
     def update(self):
         self.enemies_spawn_timer += 2
         if self.enemies_spawn_timer >= self.enemies_spawn_delay:
-            if len(self.enemies) < 30:
+            if self.enemies_count < self.enemies_number:
+                self.enemies_count += 1
                 enemy = spawn_enemy(self, self.screen, self.animation_frames)
                 self.enemies.append(enemy)
                 self.enemies_spawn_timer = 0
