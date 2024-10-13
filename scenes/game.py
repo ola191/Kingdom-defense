@@ -38,6 +38,7 @@ def timing_decorator(func):
 
 class SceneGame:
     def __init__(self, screen, level_name):
+
         self.selected_tower_position = None
         self.path = None
         self.startCord = (0,3)
@@ -67,7 +68,9 @@ class SceneGame:
         self.start_x, self.start_y, self.block_unit = calculate_start_and_block_unit(self)
 
         self.panel_visible = False
+
         self.panel_rect = pygame.Rect(self.width - 200, 50, 180, self.height - 100)
+        self.background_image = pygame.transform.scale(pygame.image.load("images/ui/button_vertical.png"), (self.panel_rect.width, 50))
 
         self.brightness_from_config = self.config_data["settings"]["brightness"]
 
@@ -396,8 +399,7 @@ class SceneGame:
         if not self.panel_visible:
             return
 
-        background_image = pygame.image.load("images/ui/button_vertical.png")
-        background_image = pygame.transform.scale(background_image, (self.panel_rect.width, 50))
+        background_image = self.background_image
 
         self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y))
         self.screen.blit(self.font.render("Archer", True, ui_color_black),

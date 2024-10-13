@@ -18,6 +18,14 @@ class ui_button:
             "button_vertical.png" : pygame.transform.scale((pygame.image.load("images/ui/button_vertical.png").convert_alpha()), self.size)
         }
 
+        self.brightness_filter = self.create_brightness_filter()
+
+    def create_brightness_filter(self):
+        self.brightness_filter = pygame.Surface(self.get_size())
+        self.brightness_filter.fill(ui_color_black)
+        self.brightness_filter.set_alpha(255 - int(255 * (self.brightness / 100)))
+        return self.brightness_filter
+
     def draw(self):
         font = pygame.font.Font(None, 40)
         button_rect = pygame.Rect(self.position, self.size)
@@ -28,9 +36,7 @@ class ui_button:
         label = font.render(self.text, True, ui_color_black)
         self.screen.blit(label, (self.position[0] + (self.size[0] - label.get_width()) // 2, self.position[1] + (self.size[1] - label.get_height()) // 2))
 
-        self.brightness_filter = pygame.Surface(self.get_size())
-        self.brightness_filter.fill(ui_color_black)
-        self.brightness_filter.set_alpha(255 - int(255 * (self.brightness / 100)))
+
         self.screen.blit(self.brightness_filter, self.position)
 
 
