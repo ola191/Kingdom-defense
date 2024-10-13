@@ -36,6 +36,7 @@ def timing_decorator(func):
 
 class SceneGame:
     def __init__(self, screen, level_name):
+        self.selected_tower_position = None
         self.path = None
         self.startCord = (0,3)
         self.endCord = (29, 25)
@@ -46,6 +47,7 @@ class SceneGame:
         self.angle_cache = {}
 
         self.font =  pygame.font.Font(None,30)
+
 
         self.average = [0]
         self.screen = screen
@@ -58,6 +60,8 @@ class SceneGame:
 
         self.start_x, self.start_y, self.block_unit = calculate_start_and_block_unit(self)
 
+        self.panel_visible = False
+        self.panel_rect = pygame.Rect(self.width - 200, 50, 180, self.height - 100)
 
         self.brightness_from_config = self.config_data["settings"]["brightness"]
 
@@ -75,6 +79,18 @@ class SceneGame:
             304 : get_texture("tower_04", size),
             305 : get_texture("tower_05", size),
             306 : get_texture("tower_06", size),
+            311 : get_texture("tower_archer_01", size),
+            312 : get_texture("tower_archer_02", size),
+            313 : get_texture("tower_archer_03", size),
+            314 : get_texture("tower_archer_04", size),
+            315 : get_texture("tower_archer_05", size),
+            316 : get_texture("tower_archer_06", size),
+            321: get_texture("tower_archer_01", size),
+            322: get_texture("tower_archer_02", size),
+            323: get_texture("tower_archer_03", size),
+            324: get_texture("tower_archer_04", size),
+            325: get_texture("tower_archer_05", size),
+            326: get_texture("tower_archer_06", size),
         }
 
 
@@ -134,8 +150,11 @@ class SceneGame:
             pass
 
     def draw_enemies(self):
+        goblin_image = pygame.image.load("images/monsters/goblin.jpg")
+        goblin_image = pygame.transform.scale(goblin_image, (self.block_unit, self.block_unit))
+
         for enemy in self.enemies:
-            pygame.draw.rect(self.screen, ui_color_black, enemy["rect"])
+            self.screen.blit(goblin_image, (enemy["rect"].x, enemy["rect"].y))
 
 
     def find_path(self, start, goal):
@@ -180,7 +199,6 @@ class SceneGame:
 
         return path
 
-    @timing_decorator
     def find_points_within_distance(self, path, x, y, max_distance):
         cache_key = (tuple(path), x, y, max_distance)
 
@@ -204,7 +222,6 @@ class SceneGame:
 
         return nearby_points
 
-    @lru_cache(maxsize=None)
     def calculate_angle(self, p1, p2):
         time_start = time.time()
         key = (p1, p2)
@@ -281,67 +298,85 @@ class SceneGame:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.handle_click(pygame.mouse.get_pos())
 
+    def is_enemy_in_range(self, tower_position, enemy_position, range_limit=7):
+        distance = math.sqrt((tower_position[0] - enemy_position[0]) ** 2 +
+                             (tower_position[1] - enemy_position[1]) ** 2)
+        return distance <= range_limit
+
+    def destroy_enemies_in_range(self):
+        for tower in self.towers:
+
+            tower_position = (tower["rect"].x // self.block_unit, tower["rect"].y // self.block_unit)
+            enemies_to_remove = []
+
+            for enemy in self.enemies:
+                enemy_position = (enemy["rect"].x // self.block_unit, enemy["rect"].y // self.block_unit)
+
+                if self.is_enemy_in_range(tower_position, enemy_position):
+                    print(f"enemy at {enemy_position}")
+                    enemies_to_remove.append(enemy)
+
+            for enemy in enemies_to_remove:
+                self.enemies.remove(enemy)
+
     def handle_click(self, mouse_pos):
         rows, cols = len(self.map_data), len(self.map_data[0])
-
         start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
 
         map_data = self.map_data
 
-        for row in range(rows):
-            for col in range(cols):
-                if map_data[row][col] == 300:
-                    tower_rect = pygame.Rect(start_x + col * block_unit, start_y + row * block_unit, block_unit, block_unit)
-                    if tower_rect.collidepoint(mouse_pos):
-                        self.on_tower_click(row, col)
 
-                square_size = block_unit / 3
-                square_positions = [
-                    (start_x + col * block_unit + (block_unit / 2) - (square_size / 2),
-                     start_y + row * block_unit - square_size),
-                    (start_x + col * block_unit + (block_unit / 2) + (square_size / 2),
-                     start_y + row * block_unit - square_size),
-                    (start_x + col * block_unit + (block_unit / 2) - (square_size / 2),
-                     start_y + row * block_unit + (block_unit / 2)),
-                    (start_x + col * block_unit + (block_unit / 2) + (square_size / 2),
-                     start_y + row * block_unit + (block_unit / 2))
-                ]
+        if self.panel_visible:
+            archer_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y, self.panel_rect.width, 50)
+            wizard_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y + 60, self.panel_rect.width, 50)
 
-                for pos in square_positions:
-                    square_rect = pygame.Rect(pos[0], pos[1], square_size, square_size)
-                    if square_rect.collidepoint(mouse_pos):
-                        self.handle_square_click(row, col)
+            if archer_button_rect.collidepoint(mouse_pos):
+                self.handle_tower_type_selection("archer")
+                return
+            elif wizard_button_rect.collidepoint(mouse_pos):
+                self.handle_tower_type_selection("wizard")
+                return
+
+        for row in range(rows - 1):
+            for col in range(cols - 2):
+                if any(map_data[row + r][col + c] in [301, 302, 303, 304, 305, 306] for r in range(2) for c in range(3)):
+
+                    if map_data[row][col] == 303:
+                        tower_rect = pygame.Rect(start_x + col * block_unit, start_y + row * block_unit, 3* block_unit,
+                                             2* block_unit)
+                        if tower_rect.collidepoint(mouse_pos):
+                            self.on_tower_click(row, col)
 
     def handle_square_click(self, row, col):
         print(f"Square clicked for tower at ({row}, {col})")
 
+    def handle_tower_type_selection(self, tower_type):
+        row, col = self.selected_tower_position
+        base_texture_id = 311 if tower_type == "archer" else 321
+
+        for i in range(3):  # Update three rows
+            self.map_data[row][col + i] = base_texture_id + i
+            self.map_data[row + 1][col + i] = base_texture_id + 3 + i
+
+        self.panel_visible = False
+        
     def on_tower_click(self, row, col):
-        self.circles.append((row,col))
-        # self.draw_circle_and_squares()
+        self.panel_visible = True
+        self.selected_tower_position = (row, col)
 
-    def draw_circle_and_squares(self):
+    def draw_panel(self):
+        if not self.panel_visible:
+            return
 
-        start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
+        background_image = pygame.image.load("images/ui/button_vertical.png")
+        background_image = pygame.transform.scale(background_image, (self.panel_rect.width, 50))
 
-        for row,col in self.circles:
-
-            center_x = start_x + col * block_unit + block_unit / 2
-            center_y = start_y + row * block_unit + block_unit / 2
-    
-            radius = block_unit * 1.5
-            pygame.draw.circle(self.screen, ui_color_black, (int(center_x), int(center_y)), int(radius), 1)
-    
-            colors = [ui_color_red, ui_color_green, ui_color_blue, ui_color_yellow]
-            square_size = block_unit / 3
-            square_positions = [
-                (center_x - square_size, center_y - square_size),  # Top-left
-                (center_x + square_size, center_y - square_size),  # Top-right
-                (center_x - square_size, center_y + square_size),  # Bottom-left
-                (center_x + square_size, center_y + square_size)   # Bottom-right
-            ]
-    
-            for pos, color in zip(square_positions, colors):
-                pygame.draw.rect(self.screen, color, (*pos, square_size, square_size))
+        self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y))
+        self.screen.blit(self.font.render("Archer", True, ui_color_black),
+                         (self.panel_rect.x + 10, self.panel_rect.y + 10))
+        self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y + 60))
+        self.screen.blit(self.font.render("Wizard", True, ui_color_black),
+                         (self.panel_rect.x + 10, self.panel_rect.y + 70))
 
     def draw(self):
         # self.screen.fill(ui_color_grass)
@@ -350,11 +385,13 @@ class SceneGame:
         # self.draw_towers()
         self.draw_enemies()
         
-        self.draw_circle_and_squares()
-        
+
         for button, (x,y) in zip(self.navbar_buttons, self.navbar_positions):
             button.position = (x, y)
             button.draw()
+
+        self.draw_panel()
+
 
         self.filter.draw()
         text = self.font.render("Score:" + str(fps), 1, (0, 0, 0))
@@ -368,6 +405,7 @@ class SceneGame:
                 spawn_enemy(self)
                 self.enemies_spawn_timer = 0
         move_enemies(self)
+        self.destroy_enemies_in_range()
 
 def scene_game(screen, level_name):
     game_scene = SceneGame(screen, level_name)
