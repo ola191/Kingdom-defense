@@ -270,19 +270,21 @@ class SceneGame:
 
         self.path.sort(key=lambda point: math.dist(reference_point, point))
 
-    def update_gold(self, action):
+    def update_gold(self, reward):
         if self.gold > 999:
             self.money_button.rect.width = 100
         else:
             self.money_button.rect.width = 75
+        #
+        # actions = {
+        #     "add" : 300,
+        #     "tower" : -50,
+        # }
+        #
+        # if action in actions:
+        #     self.gold += actions[action]
 
-        actions = {
-            "add" : 300,
-            "tower" : -50,
-        }
-
-        if action in actions:
-            self.gold += actions[action]
+        self.gold += reward
 
         self.money_button.text = f"{self.gold}"
 
@@ -368,6 +370,7 @@ class SceneGame:
         row, col = self.selected_tower_position
         base_texture_id = 311 if tower_type == "archer" else 321
         new_tower = Tower((row * self.block_unit, col * self.block_unit), tower_type)
+        self.update_gold(-new_tower.cost)
         self.towers.append(new_tower)
         for i in range(3):  # Update three rows
             self.map_data[row][col + i] = base_texture_id + i
@@ -395,9 +398,10 @@ class SceneGame:
 
     def destroy_enemies_in_range(self):
         for tower in self.towers:
-            enemies_to_remove = tower.attack(self.enemies)
+            enemies_to_remove, reward = tower.attack(self.enemies)
             for enemy in enemies_to_remove:
                 self.enemies.remove(enemy)
+                self.update_gold(reward)
 
     def draw(self):
         # self.screen.fill(ui_color_grass)

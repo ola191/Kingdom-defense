@@ -15,6 +15,7 @@ class Enemy:
         self.max_health = None
         self.health = None
         self.speed = None
+        self.reward = None
         self.alive = True
         self.path_index = 0
         self.create_param()
@@ -48,10 +49,12 @@ class Enemy:
             "goblin": {
                 "health": 100,
                 "speed": 1,
+                "reward" : 25
             },
             "orc": {
                 "health": 300,
-                "speed": 0.75
+                "speed": 0.75,
+                "reward" : 75
             }
         }
 
@@ -60,6 +63,7 @@ class Enemy:
         self.max_health = type_params["health"]
         self.health = type_params["health"]
         self.speed = type_params["speed"]
+        self.reward = type_params["reward"]
 
     def change_position(self, move_x, move_y):
         self.position[0] += move_x
@@ -73,9 +77,10 @@ class Enemy:
     def take_damage(self, damage):
         self.health -= damage
         if self.health <= 0:
-            return False
+            reward = self.reward
+            return False, reward
         else:
-            return self.health
+            return self.health, None
 
     def move_enemy(self, mSelf):
         mapUnit = mSelf.block_unit
