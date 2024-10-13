@@ -7,6 +7,7 @@ from functools import wraps, lru_cache
 import pygame
 import sys
 
+from Game.Spirits.Tower import Tower
 from Game.animations import load_animation
 from Game.assets import get_texture
 from Game.enemy import spawn_enemy
@@ -375,7 +376,8 @@ class SceneGame:
     def handle_tower_type_selection(self, tower_type):
         row, col = self.selected_tower_position
         base_texture_id = 311 if tower_type == "archer" else 321
-
+        new_tower = Tower((row * self.block_unit, col * self.block_unit), tower_type)
+        self.towers.append(new_tower)
         for i in range(3):  # Update three rows
             self.map_data[row][col + i] = base_texture_id + i
             self.map_data[row + 1][col + i] = base_texture_id + 3 + i
@@ -400,6 +402,10 @@ class SceneGame:
         self.screen.blit(self.font.render("Wizard", True, ui_color_black),
                          (self.panel_rect.x + 10, self.panel_rect.y + 70))
 
+    def destroy_enemies_in_range(self):
+        for tower in self.towers:
+            tower.attack(self.enemies)
+
     def draw(self):
         # self.screen.fill(ui_color_grass)
         self.screen.fill(ui_color_grass_100)
@@ -423,16 +429,16 @@ class SceneGame:
     def update(self):
         self.enemies_spawn_timer += 1
         if self.enemies_spawn_timer >= self.enemies_spawn_delay:
-            if len(self.enemies) < 10:
+            if len(self.enemies) < 1:
                 enemy = spawn_enemy(self, self.animation_frames)
                 self.enemies.append(enemy)
                 self.enemies_spawn_timer = 0
         self.update_enemies()
         self.update_towers()
         self.draw_enemies()
-        self.draw_towers()
+        # self.draw_towers()
 
-        # self.destroy_enemies_in_range()
+        self.destroy_enemies_in_range()
 
 def scene_game(screen, level_name):
     game_scene = SceneGame(screen, level_name)
