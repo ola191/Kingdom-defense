@@ -8,7 +8,7 @@ import pygame
 import sys
 
 from Game.assets import get_texture
-from Game.enemy import spawn_enemy, move_enemies
+from Game.enemy import spawn_enemy, move_enemy
 from Game.map import calculate_start_and_block_unit, load_map_data
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, \
     ui_color_tower, ui_color_blue, ui_color_yellow, ui_color_grass_100
@@ -45,6 +45,8 @@ class SceneGame:
 
         self.cache = {}
         self.angle_cache = {}
+
+        self.help_counter = 0
 
         self.font =  pygame.font.Font(None,30)
 
@@ -147,15 +149,24 @@ class SceneGame:
 
     def draw_towers(self):
         for tower in self.towers:
-            pass
+            texture = self.textures.get(321)
+            if texture:
+                x, y = tower.position
+                self.screen.blit(texture, (x, y))
 
     def draw_enemies(self):
-        goblin_image = pygame.image.load("images/monsters/goblin.jpg")
-        goblin_image = pygame.transform.scale(goblin_image, (self.block_unit, self.block_unit))
-
+        print(self.enemies)
         for enemy in self.enemies:
-            self.screen.blit(goblin_image, (enemy["rect"].x, enemy["rect"].y))
-
+            if self.help_counter == 100:
+                print(enemy)
+            else:
+                print(self.help_counter)
+                self.help_counter += 0.1
+            if enemy.alive:
+                goblin_image = pygame.image.load("images/monsters/goblin.jpg")
+                goblin_image = pygame.transform.scale(goblin_image, (self.block_unit, self.block_unit))
+                x,y = enemy.position
+                self.screen.blit(goblin_image, (x, y))
 
     def find_path(self, start, goal):
         rows = len(self.map_data)
@@ -199,8 +210,8 @@ class SceneGame:
 
         hardPath = [(0, 2), (3, 3), (6, 4), (9, 6), (10, 9), (11, 13), (12, 17), (11, 20), (10, 22), (9, 24), (8, 27), (8, 32), (9, 34), (12, 36), (15, 37), (18, 37), (20, 36), (22, 34), (24, 31), (25, 28), (27, 26), (29, 24)]
 
-        for x, y in hardPath:
-            self.map_data[x][y] = 321
+        # for x, y in hardPath:
+        #     self.map_data[x][y] = 321
 
 
         return hardPath
@@ -290,7 +301,7 @@ class SceneGame:
     def draw_path(self):
 
         self.path = self.find_path(self.startCord, self.endCord)
-        self.sort_path_by_distance()
+        # self.sort_path_by_distance()
         # if self.path is not None:
         #     for x, y in self.path:
         #         self.map_data[x][y] = 2
@@ -309,21 +320,29 @@ class SceneGame:
                              (tower_position[1] - enemy_position[1]) ** 2)
         return distance <= range_limit
 
-    def destroy_enemies_in_range(self):
+    # def destroy_enemies_in_range(self):
+    #     for tower in self.towers:
+    #
+    #         tower_position = (tower["rect"].x // self.block_unit, tower["rect"].y // self.block_unit)
+    #         enemies_to_remove = []
+    #         for enemy in self.enemies:
+    #             enemy_position = (enemy["rect"].x // self.block_unit, enemy["rect"].y // self.block_unit)
+    #
+    #             if self.is_enemy_in_range(tower_position, enemy_position):
+    #                 print(f"enemy at {enemy_position}")
+    #                 enemies_to_remove.append(enemy)
+    #
+    #         for enemy in enemies_to_remove:
+    #             self.enemies.remove(enemy)
+
+    def update_enemies(self):
+        for enemy in self.enemies:
+            if enemy.alive:
+                move_enemy(self, enemy)
+
+    def update_towers(self):
         for tower in self.towers:
-
-            tower_position = (tower["rect"].x // self.block_unit, tower["rect"].y // self.block_unit)
-            enemies_to_remove = []
-
-            for enemy in self.enemies:
-                enemy_position = (enemy["rect"].x // self.block_unit, enemy["rect"].y // self.block_unit)
-
-                if self.is_enemy_in_range(tower_position, enemy_position):
-                    print(f"enemy at {enemy_position}")
-                    enemies_to_remove.append(enemy)
-
-            for enemy in enemies_to_remove:
-                self.enemies.remove(enemy)
+            tower.attack(self.enemies)
 
     def handle_click(self, mouse_pos):
         rows, cols = len(self.map_data), len(self.map_data[0])
@@ -408,10 +427,13 @@ class SceneGame:
         self.enemies_spawn_timer += 1
         if self.enemies_spawn_timer >= self.enemies_spawn_delay:
             if len(self.enemies) < 10:
-                spawn_enemy(self)
+                self.enemies.append(spawn_enemy(self))
                 self.enemies_spawn_timer = 0
-        move_enemies(self)
-        self.destroy_enemies_in_range()
+        self.update_enemies()
+        self.update_towers()
+        self.draw_enemies()
+        self.draw_towers()
+        # self.destroy_enemies_in_range()
 
 def scene_game(screen, level_name):
     game_scene = SceneGame(screen, level_name)
