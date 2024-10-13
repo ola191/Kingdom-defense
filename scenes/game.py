@@ -395,13 +395,17 @@ class SceneGame:
 
     def destroy_enemies_in_range(self):
         for tower in self.towers:
-            tower.attack(self.enemies)
+            enemies_to_remove = tower.attack(self.enemies)
+            for enemy in enemies_to_remove:
+                self.enemies.remove(enemy)
 
     def draw(self):
         # self.screen.fill(ui_color_grass)
         self.screen.fill(ui_color_grass_100)
         self.draw_map()
         # self.draw_towers()
+        self.destroy_enemies_in_range()
+
         self.draw_enemies()
         
 
@@ -418,10 +422,10 @@ class SceneGame:
         pygame.display.flip()
 
     def update(self):
-        self.enemies_spawn_timer += 1
+        self.enemies_spawn_timer += 2
         if self.enemies_spawn_timer >= self.enemies_spawn_delay:
-            if len(self.enemies) < 1:
-                enemy = spawn_enemy(self, self.animation_frames)
+            if len(self.enemies) < 30:
+                enemy = spawn_enemy(self, self.screen, self.animation_frames)
                 self.enemies.append(enemy)
                 self.enemies_spawn_timer = 0
         self.update_enemies()
@@ -429,7 +433,6 @@ class SceneGame:
         self.draw_enemies()
         # self.draw_towers()
 
-        self.destroy_enemies_in_range()
 
 def scene_game(screen, level_name):
     game_scene = SceneGame(screen, level_name)

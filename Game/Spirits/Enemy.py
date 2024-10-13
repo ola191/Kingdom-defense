@@ -1,14 +1,18 @@
 import math
 import time
-from logging import currentframe
 
 import pygame
 
+from ui.colors import ui_color_green, ui_color_red
+
+
 class Enemy:
-    def __init__(self, position : tuple, enemy_type, block_unit, animation_frames):
+    def __init__(self, screen, position : tuple, enemy_type, block_unit, animation_frames):
+        self.screen = screen
         self.animation_speed = 0.1
         self.position = position
         self.enemy_type = enemy_type
+        self.max_health = None
         self.health = None
         self.speed = None
         self.alive = True
@@ -30,7 +34,13 @@ class Enemy:
         if self.alive:
             x, y = self.position
             screen.blit(self.animation_frames[int(self.current_frame)], (x, y))
-            
+
+            full_live_rect = pygame.Rect((x + 25,y), (50, 10))
+            pygame.draw.rect(self.screen, ui_color_red, full_live_rect)
+
+            live_width = (self.health / self.max_health) * 50
+            live_rect = pygame.Rect((x + 25 ,y), (live_width, 10))
+            pygame.draw.rect(self.screen, ui_color_green, live_rect)
             self.update_animation()
 
     def create_param(self):
@@ -47,6 +57,7 @@ class Enemy:
 
         type_params = params[f"{self.enemy_type}"]
 
+        self.max_health = type_params["health"]
         self.health = type_params["health"]
         self.speed = type_params["speed"]
 
@@ -62,7 +73,9 @@ class Enemy:
     def take_damage(self, damage):
         self.health -= damage
         if self.health <= 0:
-            self.alive = False
+            return False
+        else:
+            return self.health
 
     def move_enemy(self, mSelf):
         mapUnit = mSelf.block_unit

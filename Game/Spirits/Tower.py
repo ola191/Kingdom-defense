@@ -17,13 +17,13 @@ class Tower:
         params = {
             "archer" : {
                 "range" : 400,
-                "damage": 50,
-                "cooldown": 1.0
+                "damage": 25,
+                "cooldown": 1
             },
             "wizard" : {
                 "range" : 350,
                 "damage": 120,
-                "cooldown": 2.0
+                "cooldown": 2
             }
         }
 
@@ -35,13 +35,17 @@ class Tower:
 
     def attack(self,  enemies):
         current_time = time.time()
+
+        enemies_to_remove = []
         if current_time - self.last_shot_time >= self.cooldown:
             for enemy in enemies:
-                print(self.is_enemy_in_range(enemy))
                 if self.is_enemy_in_range(enemy):
-                    enemy.take_damage(self.damage)
+                    isAlive = enemy.take_damage(self.damage)
+                    if not isAlive:
+                        enemies_to_remove.append(enemy)
                     self.last_shot_time = current_time
                     break
+        return enemies_to_remove
 
     def is_enemy_in_range(self, enemy):
         distance = math.dist(self.position, enemy.position)
