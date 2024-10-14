@@ -354,13 +354,9 @@ class SceneGame:
             # tower.attack(self.enemies)
 
     def handle_click(self, mouse_pos):
-        rows, cols = len(self.map_data), len(self.map_data[0])
-        start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
-
-        map_data = self.map_data
 
 
-        if self.panel_visible:
+        if self.panel_rect.collidepoint(mouse_pos):
             archer_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y, self.panel_rect.width, 50)
             wizard_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y + 60, self.panel_rect.width, 50)
 
@@ -370,6 +366,13 @@ class SceneGame:
             elif wizard_button_rect.collidepoint(mouse_pos):
                 self.handle_tower_type_selection("wizard")
                 return
+        else:
+            self.panel_visible = False
+
+        rows, cols = len(self.map_data), len(self.map_data[0])
+        start_x, start_y, block_unit = self.start_x, self.start_y, self.block_unit
+
+        map_data = self.map_data
 
         for row in range(rows - 1):
             for col in range(cols - 2):
