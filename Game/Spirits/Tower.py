@@ -1,7 +1,6 @@
 import math
 import time
 
-
 class Tower:
     def __init__(self, position, tower_type):
         self.position = position

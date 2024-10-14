@@ -1,5 +1,4 @@
 import json
-from sys import intern
 
 import pygame
 
@@ -9,12 +8,10 @@ from ui.filters.brightness import ui_brightness
 from ui.layout.column import layout_column
 from ui.navigators.button_navigator import Navigator
 
-
 class SceneSettings:
     def __init__(self, screen):
         self.screen = screen
         self.width, self.height = screen.get_size()
-
 
         self.background_image = pygame.image.load("images/backgrounds/prison.png")
         self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))

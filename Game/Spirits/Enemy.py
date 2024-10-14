@@ -5,7 +5,6 @@ import pygame
 
 from ui.colors import ui_color_green, ui_color_red
 
-
 class Enemy:
     def __init__(self, screen, position : tuple, enemy_type, block_unit, animation_frames):
         self.screen = screen
@@ -23,7 +22,6 @@ class Enemy:
         self.animation_frames = animation_frames
         self.current_frame = 0
         self.block_unit = block_unit
-
 
     def update_animation(self):
         self.current_frame += self.animation_speed
@@ -69,10 +67,6 @@ class Enemy:
         self.position[0] += move_x
         self.position[1] += move_y
         print(self.position[0], self.position[1])
-    # def move(self):
-    #     if self.alive:
-    #         move_enemies(self)
-    #         self.position = (self.position[0], self.position[1] + self.speed)
 
     def take_damage(self, damage):
         self.health -= damage
@@ -84,9 +78,7 @@ class Enemy:
 
     def move_enemy(self, mSelf):
         mapUnit = mSelf.block_unit
-        enemies_to_remove = []
 
-        # for enemy in self.enemies:
         current_index = self.path_index
         if current_index < len(mSelf.path) - 1:
             next_point = mSelf.path[current_index + 1]
@@ -109,19 +101,6 @@ class Enemy:
                     self.path_index += 1
             else:
                 self.path_index += 1
-            # print(dist)
-            # if dist != 0:
-            #     move_x = self.speed * (dx / dist)
-            #     move_y = self.speed * (dy / dist)
-            # else:
-            #     move_x, move_y = 0, 0
-            #     self.path_index += 1
-            #
-            # self.position = (self.position[0] + move_x, self.position[1] + move_y)
-            # #
-            # # if abs(self.position[0] - target_x) < self.speed and abs(
-            # #         self.position[1] - target_y) < self.speed:
-            # #     self.speed += 1
         else:
             mSelf.enemies.remove(self)
             return -1

@@ -1,8 +1,6 @@
 import pygame
 
-from ui.colors import ui_color_white, ui_color_black, ui_color_red
-from ui.components.button import ui_button
-
+from ui.colors import ui_color_white, ui_color_black
 
 class ui_slider:
     def __init__(self, screen, position, size, min_value=0, max_value=100, initial_value=50):

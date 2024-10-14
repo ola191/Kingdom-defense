@@ -1,6 +1,5 @@
 import pygame
 
-
 def load_animation(animation_name, block_unit):
     if animation_name == "goblin":
         animation_frames = []

@@ -1,13 +1,8 @@
 import json
-from sys import intern
 
 import pygame
 
-from ui.components.button import ui_button
-from ui.components.slider import ui_slider
 from ui.filters.brightness import ui_brightness
-from ui.layout.column import layout_column
-
 
 class SceneLibrary:
     def __init__(self, screen):

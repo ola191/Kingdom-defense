@@ -36,9 +36,7 @@ class ui_button:
         label = font.render(self.text, True, ui_color_black)
         self.screen.blit(label, (self.position[0] + (self.size[0] - label.get_width()) // 2, self.position[1] + (self.size[1] - label.get_height()) // 2))
 
-
         self.screen.blit(self.brightness_filter, self.position)
-
 
     def get_size(self):
         return self.rect.size

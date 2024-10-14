@@ -1,9 +1,5 @@
 import pygame
 
-from ui.components.button import ui_button
-from ui.components.slider import ui_slider
-
-
 class Navigator:
     def __init__(self, elements):
         self.elements = elements
@@ -39,6 +35,7 @@ class Navigator:
         new_button = self.elements[self.current_index]
         new_button.selected = True
         new_button.change_brightness(80)
+
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:

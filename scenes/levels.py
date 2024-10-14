@@ -1,7 +1,6 @@
 import json
 
 import pygame
-import sys
 
 from ui.animations import Animation
 from ui.components.button import ui_button
@@ -9,7 +8,6 @@ from ui.filters.brightness import ui_brightness
 from ui.layout.column import layout_column
 from ui.layout.navbar import layout_navbar
 from ui.navigators.button_navigator import Navigator
-
 
 class SceneLevels:
     def __init__(self, screen):

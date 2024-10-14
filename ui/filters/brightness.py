@@ -14,7 +14,6 @@ class ui_brightness:
         brightness_filter.set_alpha(255 - int(255 * (self.brightness_level / 100)))
         return brightness_filter
 
-
     def draw(self):
         if self.brightness_level < 25:
             self.brightness_level = 25

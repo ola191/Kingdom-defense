@@ -12,7 +12,6 @@ def layout_column(elements, available_width, available_height, spacing):
     positions = []
     total_height = sum(element.get_size()[1] for element in elements) + (spacing * (len(elements) - 1))
 
-    # Calculate starting Y position to center the column vertically
     start_y = (available_height - total_height) // 2
 
     for element in elements:

@@ -9,13 +9,6 @@ from ui.filters.brightness import ui_brightness
 from ui.layout.column import layout_column
 from ui.navigators.button_navigator import Navigator
 
-
-def start_game(screen):
-    pass
-
-def open_settings(screen):
-    pass
-
 def quit_game():
     pygame.quit()
     sys.exit()
@@ -56,6 +49,7 @@ class SceneMainMenu:
 
     def sceneStart(self):
         return 'levels'
+
     def sceneSettings(self):
         return 'settings'
 
@@ -104,7 +98,6 @@ class SceneMainMenu:
     def quit_game():
         pygame.quit()
         sys.exit()
-
 
 def scene_main_menu(screen):
     main_menu_scene = SceneMainMenu(screen)
