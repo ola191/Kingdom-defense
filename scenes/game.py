@@ -40,6 +40,7 @@ def timing_decorator(func):
 class SceneGame:
     def __init__(self, screen, level_name):
 
+        self.tower_texture = None
         self.selected_tower_position = None
         self.path = None
         self.startCord = (0,3)
@@ -89,29 +90,29 @@ class SceneGame:
             305 : get_texture("tower_05", size),
             306 : get_texture("tower_06", size),
             311 : get_texture("tower_archer_01", size),
-            312 : get_texture("tower_archer_01", size),
-            313 : get_texture("tower_archer_01", size),
-            314 : get_texture("tower_archer_01", size),
-            315 : get_texture("tower_archer_01", size),
-            316 : get_texture("tower_archer_01", size),
+            312 : get_texture("tower_archer_02", size),
+            313 : get_texture("tower_archer_03", size),
+            314 : get_texture("tower_archer_04", size),
+            315 : get_texture("tower_archer_05", size),
+            316 : get_texture("tower_archer_06", size),
             321: get_texture("tower_archer_01", size),
-            322: get_texture("tower_archer_01", size),
-            323: get_texture("tower_archer_01", size),
-            324: get_texture("tower_archer_01", size),
-            325: get_texture("tower_archer_01", size),
-            326: get_texture("tower_archer_01", size),
+            322: get_texture("tower_archer_02", size),
+            323: get_texture("tower_archer_03", size),
+            324: get_texture("tower_archer_04", size),
+            325: get_texture("tower_archer_05", size),
+            326: get_texture("tower_archer_06", size),
             331: get_texture("tower_archer_01", size),
-            332: get_texture("tower_archer_01", size),
-            333: get_texture("tower_archer_01", size),
-            334: get_texture("tower_archer_01", size),
-            335: get_texture("tower_archer_01", size),
-            336: get_texture("tower_archer_01", size),
+            332: get_texture("tower_archer_02", size),
+            333: get_texture("tower_archer_03", size),
+            334: get_texture("tower_archer_04", size),
+            335: get_texture("tower_archer_05", size),
+            336: get_texture("tower_archer_06", size),
             341: get_texture("tower_archer_01", size),
-            342: get_texture("tower_archer_01", size),
-            343: get_texture("tower_archer_01", size),
-            344: get_texture("tower_archer_01", size),
-            345: get_texture("tower_archer_01", size),
-            346: get_texture("tower_archer_01", size),
+            342: get_texture("tower_archer_02", size),
+            343: get_texture("tower_archer_03", size),
+            344: get_texture("tower_archer_04", size),
+            345: get_texture("tower_archer_05", size),
+            346: get_texture("tower_archer_06", size),
         }
 
         self.animation_frames = load_animation("goblin", self.block_unit)
@@ -190,10 +191,8 @@ class SceneGame:
 
     def draw_towers(self):
         for tower in self.towers:
-            texture = self.textures.get(321)
-            if texture:
-                x, y = tower.position
-                self.screen.blit(texture, (x, y))
+            x, y = tower.position
+            self.screen.blit(self.tower_texture, (x, y))
 
     def draw_enemies(self):
         for enemy in self.enemies:
@@ -263,7 +262,6 @@ class SceneGame:
         y = sum(math.sin(math.radians(angle)) for angle in angles) / len(angles)
         avg_angle = math.degrees(math.atan2(y, x))
         return avg_angle if avg_angle >= 0 else 360 + avg_angle
-
 
     def filter_points_by_direction(self, points, main_point):
         angles = [self.calculate_angle(main_point, p) for p in points]
@@ -360,7 +358,6 @@ class SceneGame:
             wizard_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y + 60, self.panel_rect.width, 50)
             enchanter_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y + 120, self.panel_rect.width, 50)
             knight_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y + 180, self.panel_rect.width, 50)
-
             if archer_button_rect.collidepoint(mouse_pos):
                 self.handle_tower_type_selection("archer")
                 return
@@ -421,7 +418,7 @@ class SceneGame:
         self.update_gold(-tower_cost)
         self.towers.append(new_tower)
         for i in range(3):  # Update three rows
-            self.map_data[row][col + i] = base_texture_id + i
+            self.map_data[row][col + i] = base_texture_id + 2 - i
             self.map_data[row + 1][col + i] = base_texture_id + 3 + i
 
         self.panel_visible = False
@@ -482,10 +479,11 @@ class SceneGame:
         else:
             self.screen.fill(ui_color_grass_100)
             self.draw_map()
-            # self.draw_towers()
             self.destroy_enemies_in_range()
 
             self.draw_enemies()
+
+            self.draw_towers()
 
             for button, (x,y) in zip(self.navbar_buttons, self.navbar_positions):
                 button.position = (x, y)
@@ -495,7 +493,7 @@ class SceneGame:
 
             self.filter.draw()
             text = self.font.render("Score:" + str(fps), 1, (0, 0, 0))
-            self.screen.blit(text, (150, 20))
+            self.screen.blit(text, (175, 30))
             pygame.display.flip()
 
     def update(self):
@@ -508,8 +506,6 @@ class SceneGame:
                 self.enemies_spawn_timer = 0
         self.update_enemies()
         self.update_towers()
-        self.draw_enemies()
-        # self.draw_towers()
 
     def draw_end_menu(self):
 
