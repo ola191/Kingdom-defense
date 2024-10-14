@@ -243,10 +243,6 @@ class SceneGame:
 
         hardPath = [(0, 2), (3, 3), (6, 4), (9, 6), (10, 9), (11, 13), (12, 17), (11, 20), (10, 22), (9, 24), (8, 27), (8, 32), (9, 34), (12, 36), (15, 37), (18, 37), (20, 36), (22, 34), (24, 31), (25, 28), (27, 26), (29, 24)]
 
-        for x, y in hardPath:
-            self.map_data[x][y] = 321
-
-
         return hardPath
 
     def find_points_within_distance(self, path, x, y, max_distance):
