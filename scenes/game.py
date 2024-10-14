@@ -436,10 +436,19 @@ class SceneGame:
     def handle_square_click(self, row, col):
         print(f"Square clicked for tower at ({row}, {col})")
 
+    def info(self):
+        pass
+
     def handle_tower_type_selection(self, tower_type):
         row, col = self.selected_tower_position
         base_texture_id = 311 if tower_type == "archer" else 321
         new_tower = Tower((row * self.block_unit, col * self.block_unit), tower_type)
+
+        if new_tower.cost > self.gold:
+            self.info()
+            del new_tower
+            return
+
         self.update_gold(-new_tower.cost)
         self.towers.append(new_tower)
         for i in range(3):  # Update three rows
@@ -459,10 +468,10 @@ class SceneGame:
         background_image = self.background_image
 
         self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y))
-        self.screen.blit(self.font.render("Archer", True, ui_color_black),
+        self.screen.blit(self.font.render("Archer 100", True, ui_color_black),
                          (self.panel_rect.x + 10, self.panel_rect.y + 10))
         self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y + 60))
-        self.screen.blit(self.font.render("Wizard", True, ui_color_black),
+        self.screen.blit(self.font.render("Wizard 150", True, ui_color_black),
                          (self.panel_rect.x + 10, self.panel_rect.y + 70))
 
     def destroy_enemies_in_range(self):
