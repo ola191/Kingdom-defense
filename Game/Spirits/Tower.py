@@ -22,9 +22,25 @@ class Tower:
             },
             "wizard" : {
                 "range" : 350,
-                "damage": 120,
+                "damage": 75,
                 "cooldown": 2,
                 "cost" : 150
+            },
+            "enchanter": {
+                "range": 350,
+                "damage": 0,
+                "enchantments" : {
+                    "slowdown"
+                },
+                "cooldown": 3,
+                "cost": 75
+            },
+            "knight": {
+                "range": 150,
+                "damage": 40,
+                "capacity": 2,
+                "cooldown": 1.5,
+                "cost": 50
             }
         }
 

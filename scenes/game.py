@@ -89,17 +89,29 @@ class SceneGame:
             305 : get_texture("tower_05", size),
             306 : get_texture("tower_06", size),
             311 : get_texture("tower_archer_01", size),
-            312 : get_texture("tower_archer_02", size),
-            313 : get_texture("tower_archer_03", size),
-            314 : get_texture("tower_archer_04", size),
-            315 : get_texture("tower_archer_05", size),
-            316 : get_texture("tower_archer_06", size),
+            312 : get_texture("tower_archer_01", size),
+            313 : get_texture("tower_archer_01", size),
+            314 : get_texture("tower_archer_01", size),
+            315 : get_texture("tower_archer_01", size),
+            316 : get_texture("tower_archer_01", size),
             321: get_texture("tower_archer_01", size),
-            322: get_texture("tower_archer_02", size),
-            323: get_texture("tower_archer_03", size),
-            324: get_texture("tower_archer_04", size),
-            325: get_texture("tower_archer_05", size),
-            326: get_texture("tower_archer_06", size),
+            322: get_texture("tower_archer_01", size),
+            323: get_texture("tower_archer_01", size),
+            324: get_texture("tower_archer_01", size),
+            325: get_texture("tower_archer_01", size),
+            326: get_texture("tower_archer_01", size),
+            331: get_texture("tower_archer_01", size),
+            332: get_texture("tower_archer_01", size),
+            333: get_texture("tower_archer_01", size),
+            334: get_texture("tower_archer_01", size),
+            335: get_texture("tower_archer_01", size),
+            336: get_texture("tower_archer_01", size),
+            341: get_texture("tower_archer_01", size),
+            342: get_texture("tower_archer_01", size),
+            343: get_texture("tower_archer_01", size),
+            344: get_texture("tower_archer_01", size),
+            345: get_texture("tower_archer_01", size),
+            346: get_texture("tower_archer_01", size),
         }
 
         self.animation_frames = load_animation("goblin", self.block_unit)
@@ -343,14 +355,23 @@ class SceneGame:
 
     def handle_click(self, mouse_pos):
         if self.panel_rect.collidepoint(mouse_pos):
+
             archer_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y, self.panel_rect.width, 50)
             wizard_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y + 60, self.panel_rect.width, 50)
+            enchanter_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y + 120, self.panel_rect.width, 50)
+            knight_button_rect = pygame.Rect(self.panel_rect.x, self.panel_rect.y + 180, self.panel_rect.width, 50)
 
             if archer_button_rect.collidepoint(mouse_pos):
                 self.handle_tower_type_selection("archer")
                 return
             elif wizard_button_rect.collidepoint(mouse_pos):
                 self.handle_tower_type_selection("wizard")
+                return
+            elif enchanter_button_rect.collidepoint(mouse_pos):
+                self.handle_tower_type_selection("enchanter")
+                return
+            elif knight_button_rect.collidepoint(mouse_pos):
+                self.handle_tower_type_selection("knight")
                 return
         else:
             self.panel_visible = False
@@ -378,7 +399,17 @@ class SceneGame:
 
     def handle_tower_type_selection(self, tower_type):
         row, col = self.selected_tower_position
-        base_texture_id = 311 if tower_type == "archer" else 321
+
+        base_texture_id = None
+        if tower_type == "archer":
+            base_texture_id = 311
+        elif tower_type == "wizard":
+            base_texture_id = 321
+        elif tower_type == "enchanter":
+            base_texture_id = 331
+        elif tower_type == "knight":
+            base_texture_id = 341
+
         new_tower = Tower((row * self.block_unit, col * self.block_unit), tower_type)
 
         tower_cost = new_tower.cost
@@ -406,11 +437,32 @@ class SceneGame:
         background_image = self.background_image
 
         self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y))
-        self.screen.blit(self.font.render("Archer 100", True, ui_color_black),
-                         (self.panel_rect.x + 10, self.panel_rect.y + 10))
+        self.screen.blit(self.font.render(
+            "Archer 100",
+            True,
+            ui_color_black),
+        (self.panel_rect.x + 10, self.panel_rect.y + 10))
+
         self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y + 60))
-        self.screen.blit(self.font.render("Wizard 150", True, ui_color_black),
-                         (self.panel_rect.x + 10, self.panel_rect.y + 70))
+        self.screen.blit(self.font.render(
+            "Wizard 150",
+            True,
+            ui_color_black),
+        (self.panel_rect.x + 10, self.panel_rect.y + 75))
+
+        self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y + 120))
+        self.screen.blit(self.font.render(
+            "Enchanter 75",
+            True,
+            ui_color_black),
+        (self.panel_rect.x + 10, self.panel_rect.y + 135))
+
+        self.screen.blit(background_image, (self.panel_rect.x, self.panel_rect.y + 180))
+        self.screen.blit(self.font.render(
+            "Knight 50",
+            True,
+            ui_color_black),
+        (self.panel_rect.x + 10, self.panel_rect.y + 195))
 
     def destroy_enemies_in_range(self):
         for tower in self.towers:
