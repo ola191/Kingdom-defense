@@ -12,11 +12,14 @@ from Game.animations import load_animation
 from Game.assets import get_texture
 from Game.enemy import spawn_enemy
 from Game.map import calculate_start_and_block_unit, load_map_data
+from ui.animations import Animation
 from ui.colors import ui_color_black, ui_color_white, ui_color_red, ui_color_green, ui_color_sand, \
     ui_color_tower, ui_color_blue, ui_color_yellow, ui_color_grass_100
 from ui.components.button import ui_button
 from ui.filters.brightness import ui_brightness
+from ui.layout.column import layout_column
 from ui.layout.navbar import layout_navbar
+from ui.navigators.button_navigator import Navigator
 
 fps = 0
 clock = pygame.time.Clock()
@@ -104,6 +107,8 @@ class SceneGame:
 
         self.animation_frames = load_animation("goblin", self.block_unit)
 
+        self.freeze = False
+
         self.circles = []
 
         self.towers = []
@@ -123,6 +128,30 @@ class SceneGame:
         self.navbar_buttons = [self.money_button, self.hearts_button]
 
         self.navbar_positions = layout_navbar(self.navbar_buttons, self.width, self.height, 10, "left", 25, 20)
+
+
+        self.end_menu_score_button = ui_button(self.screen, "Congratulations", (0,0), (300, 50), None, "button_vertical.png", 100)
+        self.end_menu_gold_button = ui_button(self.screen, f"{self.gold}", (0,0), (50, 50), None, "button_vertical.png", 100)
+        self.end_menu_return_to_levels = ui_button(self.screen, "Return", (0,0), (150, 50), None, "button_vertical.png", 100)
+
+        self.end_menu_buttons = [
+            self.end_menu_score_button, self.end_menu_gold_button, self.end_menu_return_to_levels
+        ]
+
+        self.end_menu_buttons[0].change_brightness(80)
+
+        self.end_menu_buttons_positions = layout_column(self.end_menu_buttons, self.width, self.height, 10)
+
+        self.button_navigator = Navigator(self.end_menu_buttons)
+
+        self.selected_button = self.end_menu_buttons[0]
+
+        self.button_navigator.update_selection()
+
+        self.mixer = pygame.mixer
+        self.mixer.init()
+
+        self.click_sound = self.mixer.Sound("sounds/button_click.wav")
 
     def load_json_data(self, filename):
         with open(filename, "r") as jsonFile:
@@ -314,8 +343,31 @@ class SceneGame:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return 'levels'
+            elif event.key == pygame.K_DOWN:
+                self.click_sound.play()
+
+                self.button_navigator.next()
+                self.selected_button = self.button_navigator.get_current()
+            elif event.key == pygame.K_UP:
+                self.click_sound.play()
+
+                self.button_navigator.previous()
+                self.selected_button = self.button_navigator.get_current()
+            elif event.key == pygame.K_RETURN:
+
+                current_button = self.button_navigator.get_current()
+                if current_button == self.end_menu_return_to_levels:
+                    self.click_sound.play()
+                    return 'levels'
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            for button, level in zip(self.end_menu_buttons, self.end_menu_buttons_positions):
+                if button.collidepoint(event.pos):
+                    if button == self.end_menu_return_to_levels:
+                        Animation.click_background(self.screen, 80, 40, 30, button, 200)
+                        return("levels")
             self.handle_click(pygame.mouse.get_pos())
+
+
 
     def is_enemy_in_range(self, tower_position, enemy_position, range_limit=7):
         distance = math.sqrt((tower_position[0] - enemy_position[0]) ** 2 +
@@ -346,7 +398,8 @@ class SceneGame:
                         self.update_hearts(passed)
         else:
             if self.enemies_count == self.enemies_number:
-                pygame.quit()
+                self.freeze = True
+                self.draw_end_menu()
 
     def update_towers(self):
         for tower in self.towers:
@@ -424,26 +477,33 @@ class SceneGame:
                 self.update_gold(reward)
 
     def draw(self):
-        # self.screen.fill(ui_color_grass)
-        self.screen.fill(ui_color_grass_100)
-        self.draw_map()
-        # self.draw_towers()
-        self.destroy_enemies_in_range()
+        if self.freeze:
+            self.screen.fill(ui_color_grass_100)
+            self.draw_map()
+            self.draw_end_menu()
+            self.filter.draw()
+            pygame.display.flip()
+        else:
+            # self.screen.fill(ui_color_grass)
+            self.screen.fill(ui_color_grass_100)
+            self.draw_map()
+            # self.draw_towers()
+            self.destroy_enemies_in_range()
 
-        self.draw_enemies()
+            self.draw_enemies()
 
 
-        for button, (x,y) in zip(self.navbar_buttons, self.navbar_positions):
-            button.position = (x, y)
-            button.draw()
+            for button, (x,y) in zip(self.navbar_buttons, self.navbar_positions):
+                button.position = (x, y)
+                button.draw()
 
-        self.draw_panel()
+            self.draw_panel()
 
 
-        self.filter.draw()
-        text = self.font.render("Score:" + str(fps), 1, (0, 0, 0))
-        self.screen.blit(text, (150, 20))
-        pygame.display.flip()
+            self.filter.draw()
+            text = self.font.render("Score:" + str(fps), 1, (0, 0, 0))
+            self.screen.blit(text, (150, 20))
+            pygame.display.flip()
 
     def update(self):
         self.enemies_spawn_timer += 2
@@ -458,6 +518,11 @@ class SceneGame:
         self.draw_enemies()
         # self.draw_towers()
 
+    def draw_end_menu(self):
+
+        for button, (x, y) in zip(self.end_menu_buttons, self.end_menu_buttons_positions):
+            button.position = (x, y)
+            button.draw()
 
 def scene_game(screen, level_name):
     game_scene = SceneGame(screen, level_name)

@@ -45,6 +45,7 @@ class ui_button:
 
     def change_brightness(self, brightness):
         self.brightness = brightness
+        self.brightness_filter = self.create_brightness_filter()
 
     def collidepoint(self, pos):
         return self.rect.collidepoint(pos)

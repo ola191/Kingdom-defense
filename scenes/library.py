@@ -14,7 +14,6 @@ class SceneLibrary:
         self.screen = screen
         self.width, self.height = screen.get_size()
 
-
         self.background_image = pygame.image.load("images/backgrounds/library.png")
         self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))
 

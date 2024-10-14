@@ -28,7 +28,6 @@ class Navigator:
         self._update_index((self.current_index - 1) % len(self.elements))
 
     def _update_index(self, new_index):
-
         self.current_index = new_index
 
         old_button = self.elements[self.old_index]
@@ -40,7 +39,6 @@ class Navigator:
         new_button = self.elements[self.current_index]
         new_button.selected = True
         new_button.change_brightness(80)
-
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:

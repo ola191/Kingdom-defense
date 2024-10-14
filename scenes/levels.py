@@ -32,7 +32,7 @@ class SceneLevels:
             ui_button(self.screen, level, (0,0), (300,50), None, "button_vertical.png", 100) for level in self.levels
         ]
 
-        self.levels_buttons[0].brightness = 80
+        self.levels_buttons[0].change_brightness(80)
 
         self.navbar_buttons = []
 
